@@ -3,7 +3,7 @@ title: "Set Your Minds"
 date: 2014-05-16
 languages: ["en"]
 kind: "article"
-source: {"wpId": 1739, "wpSlug": "set-your-minds"}
+source: {"wpId": 1739, "wpSlug": "set-your-minds", "wpType": "post"}
 ---
 
 Reading passage: Col.: 3.1-17

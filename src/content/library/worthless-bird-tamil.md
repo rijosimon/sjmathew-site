@@ -1,10 +1,10 @@
 ---
 title: "Worthless Bird – Tamil"
 date: 2014-01-30
-languages: ["en"]
+languages: ["ta"]
 type: "tract"
-file: "/sample/docs/sample.pdf"
-source: {"wpId": 1653, "wpSlug": "worthless-bird-tamil"}
+file: "library/etracts/tamil/worthless-bird-tamil.pdf"
+source: {"wpId": 1653, "wpSlug": "worthless-bird-tamil", "wpType": "post"}
 ---
 
 
