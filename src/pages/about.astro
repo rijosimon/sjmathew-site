@@ -1,5 +1,6 @@
 ---
 import { getEntry, render } from 'astro:content';
+import Portrait from '../components/Portrait.astro';
 import Base from '../layouts/Base.astro';
 
 const page = await getEntry('pages', 'about');
@@ -8,22 +9,49 @@ const { Content } = await render(page);
 ---
 
 <Base title={page.data.title} description="About Saju John Mathew, Bible teacher and missionary.">
-	<div class="wrap section" data-pagefind-body>
-		<header class="page-head">
-			<p class="eyebrow">About</p>
-			<h1>{page.data.title}</h1>
-		</header>
-		<div class="prose">
-			<Content />
+	<div class="wrap section about" data-pagefind-body>
+		<div class="about-text">
+			<header class="page-head">
+				<p class="eyebrow">About</p>
+				<h1>{page.data.title}</h1>
+			</header>
+			<div class="prose">
+				<Content />
+			</div>
+			<p class="next">
+				<a class="btn" href="/contact/">Get in touch</a>
+			</p>
 		</div>
-		<p class="next">
-			<a class="btn" href="/contact/">Get in touch</a>
-		</p>
+		<div class="about-photo">
+			<Portrait />
+		</div>
 	</div>
 </Base>
 
 <style>
+	.about {
+		display: grid;
+		gap: 2rem;
+	}
+	/* On phones the photo comes first, like a title picture. */
+	.about-photo {
+		order: -1;
+	}
 	.next {
 		margin-top: 2rem;
+	}
+	@media (min-width: 52rem) {
+		.about {
+			grid-template-columns: minmax(0, 40rem) 18rem;
+			gap: 4rem;
+			align-items: start;
+			justify-content: start;
+		}
+		.about-photo {
+			order: 0;
+			position: sticky;
+			top: 1.5rem;
+			padding-top: 2.6rem;
+		}
 	}
 </style>
