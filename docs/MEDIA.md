@@ -21,24 +21,39 @@ with its size and MD5 checksum. Only files that a published page links to were c
 
 ## One-time setup (you)
 
-1. **Create the Space** (DigitalOcean → Spaces Object Storage → Create): region **Singapore
-   (sgp1)**, name `sjmathew-media`. Turn on the **CDN**, and choose **Restrict File Listing** so
-   people can fetch files but not list them. The plan is $5 a month and includes 250 GiB.
-2. **Create an access key** (Spaces → Access Keys → Generate New Key). Keep the secret private; you
-   only see it once.
-3. **Tell rclone about it.** Run `rclone config`, choose `n` (new remote), name it `sjmathew`, type
-   `s3`, provider `DigitalOcean Spaces`, choose "Enter AWS credentials in the next step", and paste
-   the key and secret when asked. Endpoint: `sgp1.digitaloceanspaces.com`. ACL: `public-read`.
+1. **Create the bucket.** In the DigitalOcean panel: **Spaces Object Storage → Create Bucket**.
+   Region **Singapore (sgp1)**, name `sjmathew-media` (3 to 63 characters; if it is taken, add a
+   suffix). The plan is $5 a month and includes 250 GiB.
+2. **Turn on the CDN.** Open the bucket → **Settings** tab → **CDN** → **Edit** → **Enable CDN**.
+   Note the CDN address it shows, like `https://sjmathew-media.sgp1.cdn.digitaloceanspaces.com`.
+3. **Create an access key.** **Spaces Object Storage → Access Keys** tab → **Create Access Key**.
+   If it offers per-bucket access, give it read, write and delete on `sjmathew-media` only. The
+   secret is shown once: copy it into your password manager. Keys can only be created in the panel,
+   not from the command line, and should never be pasted into chat or committed.
+4. **Tell rclone about it.** Run `rclone config` and answer: `n` (new remote), name `sjmathew`,
+   storage `s3`, provider `DigitalOcean`, `env_auth` false, then your access key and secret,
+   endpoint `sgp1.digitaloceanspaces.com`, ACL `public-read`, and accept the defaults for the rest.
+   The result in `~/.config/rclone/rclone.conf` looks like:
+   ```ini
+   [sjmathew]
+   type = s3
+   provider = DigitalOcean
+   access_key_id = <your key>
+   secret_access_key = <your secret>
+   endpoint = sgp1.digitaloceanspaces.com
+   acl = public-read
+   ```
+   Test it: `rclone lsd sjmathew:` should list `sjmathew-media`.
 
 ## Upload
 
 ```bash
-rclone copy ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media \
+caffeinate -i rclone copy ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media \
   --transfers 8 --checksum --progress \
   --header-upload "Cache-Control: public, max-age=31536000"
 ```
 
-It can be stopped and started again; files that already arrived are skipped. Expect a few hours,
+`caffeinate -i` keeps the Mac awake while it runs. It can be stopped and started again; files that already arrived are skipped. Expect a few hours,
 depending on your upload speed. Then confirm nothing is missing or damaged:
 
 ```bash
@@ -48,7 +63,7 @@ rclone check ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media --one-way
 ## Connect the site
 
 The Space's CDN address looks like `https://sjmathew-media.sgp1.cdn.digitaloceanspaces.com`.
-Set it as the site's media address, in `.do/app.yaml`:
+Set it as the site's media address in `.do/app.yaml` (I can do this for you once the upload has been checked):
 
 ```yaml
 static_sites:
