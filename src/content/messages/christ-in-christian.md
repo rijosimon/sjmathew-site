@@ -3,6 +3,7 @@ title: "Christ in Christian"
 date: 2012-11-01
 languages: ["en"]
 kind: "video"
+video: {"provider": "file", "src": "video/cic/nq/christ-in-christian.mp4"}
 downloads: [{"label": "Download Video", "href": "downloads/video/cic/nq/christ-in-christian.zip", "note": "91.2 MB"}, {"label": "Click Here", "href": "audio/cic/nq/christ-in.mp3", "note": "12.6 MB"}, {"label": "Download Audio", "href": "downloads/video/cic/nq/christ-in.zip", "note": "12.4 MB"}]
 source: {"wpId": 1020, "wpSlug": "christ-in-christian", "wpType": "post"}
 ---

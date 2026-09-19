@@ -1,39 +1,42 @@
 # sjmathew.com
 
-A fresh static rebuild of sjmathew.com (recorded messages, e-books and tracts in Malayalam, English, Hindi and Swahili), replacing the old WordPress site.
+A static rebuild of sjmathew.com: recorded messages, e-books and tracts by Saju John Mathew, in Malayalam,
+English, Hindi, Swahili, Tamil, Portuguese and Sinhala. It replaces the old WordPress site.
 
-Status: **design prototype**. Content is a small real sample; audio, video and PDFs are placeholders in `public/sample/`. The banner and `noindex` tag come from `PREVIEW` in `src/lib/site.ts`.
+Status: **preview.** The real content and media are imported. The banner and `noindex` tag come from
+`PREVIEW` in `src/lib/site.ts`; switch it off when the site goes live.
 
-## Decisions
+## How it is built
 
-| Topic | Decision |
+| Topic | Choice |
 |---|---|
 | Stack | Astro 7, static output, no server code |
-| Hosting | DigitalOcean: App Platform static site + Spaces for media (about $5/month) |
-| Comments / contact form | None. Contact is a static page |
-| URLs | New structure; old slugs are not preserved |
-| Media | Everything kept, deduplicated and converted to web formats (later epics) |
-| Editing | Decap CMS, Git-backed (later epic) |
-| Languages | Malayalam, English, Hindi, Swahili; fonts are Noto Serif/Sans per script |
-
-The working plan lives in `.plan/rebuild.md` (gitignored).
+| Hosting | DigitalOcean App Platform (static site); media in a DigitalOcean Space |
+| Editing | Decap CMS at `/admin/`, saving commits to this repository (see `docs/EDITING.md`) |
+| Search | Pagefind, built after the site (`/search/`) |
+| Fonts | Noto Serif and Noto Sans per script, self-hosted at build time |
+| Comments, contact form | None; the contact page is plain text |
 
 ## Run it
 
 ```bash
 npm install
-npm run dev      # http://localhost:4321
-npm run build    # static site in dist/
-npm run check    # type-check .astro and TypeScript files
+npm run dev       # http://localhost:4321  (serves ~/Workspace/sjmathew-media/out at /media if present)
+npm run build     # static site in dist/, then the search index
+npm run preview   # serve the built site
+npm run check     # type-check
+npm run cms       # local helper for the editor (no login needed on your own computer)
+python3 scripts/check_site.py   # after a build: broken links and missing media
 ```
 
-Needs Node 22.12+ and internet access at build time (the fonts are fetched from Fontsource and self-hosted in the output).
+Needs Node 22.12+ and internet access at build time (fonts). Media addresses come from
+`PUBLIC_MEDIA_BASE_URL` (default `/media`).
 
-## Layout
+## Where things are
 
-- `src/content/messages/`: audio, video and reading entries (Markdown + front matter, schema in `src/content.config.ts`)
-- `src/content/library/`: e-books and tracts
-- `src/content/pages/`: About
-- `src/components/`: cards, filters, `AudioPlayer`, `VideoPlayer` (YouTube click-to-load or a self-hosted file)
-- `src/pages/`: routes (`/`, `/messages/`, `/messages/[slug]/`, `/series/`, `/library/`, `/about/`, `/contact/`)
-- `src/styles/global.css`: design tokens (light/dark palette, type scale, per-script line heights)
+- `src/content/messages/`, `library/`, `pages/`: the content (Markdown with front matter; schema in `src/content.config.ts`). File references are media keys such as `audio/ykt/class-08.mp3`.
+- `src/components/`, `src/pages/`, `src/styles/global.css`: the design, players, filters, search and feed.
+- `public/admin/`: the editor. `oauth-helper/`: its GitHub login helper (tested, not deployed).
+- `docs/EDITING.md`: adding messages and setting up the editor login. `docs/MEDIA.md`: the media library and how to upload it.
+- `scripts/migration/`: the tools that read the old site and produced the content and media library. `data/media-report.md` and `data/export-report.md` say what they found.
+- `.do/app.yaml`: the App Platform app definition.

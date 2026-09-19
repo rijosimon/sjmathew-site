@@ -116,6 +116,8 @@ class Media:
         plan = json.load(open(os.path.join(RAW, "media-plan.json")))
         self.url_to_key = plan["url_to_key"]
         self.size_by_key = {i["key"]: i["size"] for i in plan["published"]}
+        zclass = json.load(open(os.path.join(RAW, "zip-classes.json")))
+        self.zip_class = {i["key"]: zclass.get(i["path"], "") for i in plan["published"] if i["ext"] == "zip"}
         self.refs = json.load(open(os.path.join(RAW, "media-refs.json")))
         self.theme = {}          # key -> theme relative path
         self.unresolved = []     # (item, url)
@@ -284,6 +286,24 @@ def convert(item, kind_hint, media, cats, report):
             "videos": videos, "downloads": downloads, "body": body, "cats": cat_ids, "slug": item["slug"]}
 
 
+def playable_from_zip(c, media, used_keys):
+    """Old download-only video posts: the smallest video zip holds one video file. Plan an MP4 of it
+    so the page can play it; the zip stays as a download. Returns (zip key, mp4 key) or None."""
+    zips = [d["href"] for d in c["downloads"] if d["href"].endswith(".zip") and media.zip_class.get(d["href"]) == "video"]
+    if not zips:
+        return None
+    zips.sort(key=lambda k: media.size_by_key.get(k, 1 << 60))
+    zip_key = zips[0]
+    mp4 = re.sub(r"(?i)[-_](nq|hq)(?=\.zip$)", "", zip_key)
+    mp4 = "video/" + mp4[len("downloads/video/"):-len(".zip")] + ".mp4"
+    n, base = 2, mp4
+    while mp4 in used_keys:
+        mp4 = base[:-4] + "-%d.mp4" % n
+        n += 1
+    used_keys.add(mp4)
+    return zip_key, mp4
+
+
 def pick_kind(c, is_page):
     if c["tracks"]:
         return "audio"
@@ -370,6 +390,7 @@ def main():
             if f.endswith(".md") and f != "about.md":
                 os.remove(os.path.join(OUT, d, f))
     used = set()
+    video_from_zip, used_video_keys = [], set()
     counts = collections.Counter()
 
     for src, items in (("post", posts), ("page", pages)):
@@ -405,6 +426,12 @@ def main():
             if kind == "article" and not c["body"] and not c["downloads"]:
                 report["empty_posts"].append((wp_id, c["title"][:50]))
                 continue
+            if kind == "video" and not c["videos"]:
+                pz = playable_from_zip(c, media, used_video_keys)
+                if pz:
+                    c["videos"] = [{"provider": "file", "src": pz[1]}]
+                    video_from_zip.append({"zip": pz[0], "key": pz[1], "wpId": wp_id})
+                    counts["message:video (played from its zip)"] += 1
             s = make_slug(c, used)
             front = {"title": q(c["title"]), "date": c["date"], "languages": q(c["langs"]), "kind": q(kind)}
             if 33 in c["cats"]:
@@ -422,6 +449,7 @@ def main():
                 counts["message:%s (downloads only)" % kind] += 1
 
     rewrite_internal_links(report)
+    json.dump(video_from_zip, open(os.path.join(RAW, "video-from-zip.json"), "w"), indent=1)
 
     tracks_theme = sorted(media.theme.items())
     json.dump(tracks_theme, open(os.path.join(RAW, "theme-audio-keys.json"), "w"), indent=1)

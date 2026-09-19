@@ -3,6 +3,7 @@ title: "Changing Culture and Unchanging Gospel"
 date: 2012-11-10
 languages: ["en"]
 kind: "video"
+video: {"provider": "file", "src": "video/ccug/nq/changing-culture-and-unchanging-gospel.mp4"}
 downloads: [{"label": "Download Video", "href": "downloads/video/ccug/nq/changing-culture-and-unchanging-gospel.zip", "note": "117 MB"}, {"label": "Click Here", "href": "audio/ccug/nq/changing-culture.mp3", "note": "23.3 MB"}, {"label": "Download Audio", "href": "downloads/video/ccug/nq/changing-culture.zip", "note": "23.1 MB"}]
 source: {"wpId": 1083, "wpSlug": "changing-culture", "wpType": "post"}
 ---

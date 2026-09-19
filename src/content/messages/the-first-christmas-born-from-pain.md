@@ -3,6 +3,7 @@ title: "വേദനയില്‍ വിരിഞ്ഞ ആദ്യത്ത�
 date: 2012-12-14
 languages: ["ml"]
 kind: "video"
+video: {"provider": "file", "src": "video/vvac/nq/vedhanayil-virinja-aadhyathe-christmas.mp4"}
 downloads: [{"label": "Download Video", "href": "downloads/video/vvac/nq/vedhanayil-virinja-aadhyathe-christmas.zip", "note": "62.7 MB"}, {"label": "Click Here", "href": "audio/vvac/nq/vedhanayil-virinja-aadhyathe-christmas.mp3", "note": "10.2 MB"}, {"label": "Download Audio", "href": "downloads/video/vvac/nq/vedhanayil-virinja-aadhyathe-christmas-audio.zip", "note": "9.9 MB"}]
 source: {"wpId": 1168, "wpSlug": "christmas", "wpType": "post"}
 ---

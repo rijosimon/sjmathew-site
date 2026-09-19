@@ -3,6 +3,7 @@ title: "യേശുവിനു താമസിക്കാനൊരു വീ�
 date: 2014-03-25
 languages: ["ml"]
 kind: "video"
+video: {"provider": "file", "src": "video/ytov/yesuvinu-thamasikkuvan-oru-veedu-mp4.mp4"}
 downloads: [{"label": "Video, normal quality", "href": "downloads/video/ytov/yesuvinu-thamasikkuvan-oru-veedu-mp4.zip", "note": "166 MB"}, {"label": "Video, high quality", "href": "downloads/video/ytov/yesuvinu-thamasikkuvan-oru-veedu-video.zip", "note": "297 MB"}, {"label": "Audio, normal quality", "href": "downloads/video/ytov/yesuvinu-thamasikkuvan-oru-veedu-mp3.zip", "note": "38.5 MB"}, {"label": "Audio, high quality", "href": "downloads/video/ytov/yesuvinu-thamasikkuvan-oru-veedu-audio.zip", "note": "87.1 MB"}, {"label": "Click Here", "href": "audio/ytov/audio.mp3", "note": "39.5 MB"}]
 source: {"wpId": 1708, "wpSlug": "home-for-jesus", "wpType": "post"}
 ---

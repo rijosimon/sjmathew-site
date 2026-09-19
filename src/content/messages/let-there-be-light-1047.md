@@ -3,6 +3,7 @@ title: "Let there be Light"
 date: 2012-11-04
 languages: ["en"]
 kind: "video"
+video: {"provider": "file", "src": "video/lbl/nq/let-there-be.mp4"}
 downloads: [{"label": "Download Video", "href": "downloads/video/lbl/nq/let-there-be.zip", "note": "72.4 MB"}, {"label": "Click Here", "href": "audio/lbl/nq/let-there-be-light.mp3", "note": "12.2 MB"}, {"label": "Download Audio", "href": "downloads/video/lbl/nq/let-there-be-light.zip", "note": "12.1 MB"}]
 source: {"wpId": 1047, "wpSlug": "light", "wpType": "post"}
 ---
