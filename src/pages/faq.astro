@@ -1,0 +1,20 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+const page = await getEntry('pages', 'faq');
+if (!page) throw new Error('Missing content: src/content/pages/faq.md');
+const { Content } = await render(page);
+---
+
+<Base title="Frequently asked questions" description="Answers to common questions about these messages and about Saju.">
+	<div class="wrap section" data-pagefind-body>
+		<header class="page-head">
+			<p class="eyebrow">FAQ</p>
+			<h1>{page.data.title}</h1>
+		</header>
+		<div class="prose">
+			<Content />
+		</div>
+	</div>
+</Base>

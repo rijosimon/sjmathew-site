@@ -21,7 +21,7 @@ const watchUrl =
 			<video controls preload="metadata" playsinline poster={video.poster} src={video.src}>
 				<a href={video.src}>Download the video</a>
 			</video>
-			{PREVIEW && <p class="note">Placeholder video: the real recording replaces this clip after the design is approved.</p>}
+			{PREVIEW && video.src.startsWith('/sample/') && <p class="note">Placeholder video: the real recording replaces this clip after the design is approved.</p>}
 		</div>
 	) : (
 		<div class="frame">

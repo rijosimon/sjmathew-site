@@ -14,7 +14,7 @@ const tiles = LANGUAGE_ORDER.map((code) => ({
 	code,
 	...LANGUAGES[code],
 	count: messages.filter((m) => m.data.languages.includes(code)).length,
-}));
+})).filter((tile) => tile.count > 0);
 ---
 
 <Base>

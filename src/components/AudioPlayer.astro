@@ -61,7 +61,7 @@ const multiple = tracks.length > 1;
 			</ol>
 		)
 	}
-	{PREVIEW && <p class="note">Placeholder audio: the real recordings replace this clip after the design is approved.</p>}
+	{PREVIEW && tracks.some((t) => t.src.startsWith('/sample/')) && <p class="note">Placeholder audio: the real recordings replace this clip after the design is approved.</p>}
 </audio-player>
 
 <script>

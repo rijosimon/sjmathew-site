@@ -19,9 +19,12 @@
 	--lang-en: #0e5a63;
 	--lang-hi: #7a4b9a;
 	--lang-sw: #3d7a3a;
+	--lang-pt: #96650a;
+	--lang-ta: #a3335c;
+	--lang-si: #4b5fa8;
 
-	--serif: var(--font-serif-latin), var(--font-serif-ml), var(--font-serif-hi), Georgia, serif;
-	--sans: var(--font-sans-latin), var(--font-sans-ml), var(--font-sans-hi), system-ui, sans-serif;
+	--serif: var(--font-serif-latin), var(--font-serif-ml), var(--font-serif-hi), var(--font-serif-ta), Georgia, serif;
+	--sans: var(--font-sans-latin), var(--font-sans-ml), var(--font-sans-hi), var(--font-sans-ta), system-ui, sans-serif;
 
 	--radius: 14px;
 	--radius-sm: 8px;
@@ -52,6 +55,9 @@
 		--lang-en: #6fc7c9;
 		--lang-hi: #c7a0e2;
 		--lang-sw: #8ccb88;
+		--lang-pt: #e0b45c;
+		--lang-ta: #ee92b5;
+		--lang-si: #97a7e8;
 	}
 }
 

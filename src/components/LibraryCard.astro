@@ -1,7 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import LanguageBadge from './LanguageBadge.astro';
-import { scriptLang, type LibraryItem } from '../lib/site';
+import { mediaUrl, scriptLang, type LibraryItem } from '../lib/site';
 
 interface Props {
 	item: LibraryItem;
@@ -20,8 +20,8 @@ const { data } = item;
 		<p class="langs">
 			{data.languages.map((code) => <LanguageBadge code={code} />)}
 		</p>
-		<a class="btn secondary" href={data.file} download>
-			<Icon name="download" size={18} />Download PDF<span class="sr-only">: {data.title}</span>
+		<a class="btn secondary" href={mediaUrl(data.file)} download>
+			<Icon name="download" size={18} />Download<span class="sr-only">: {data.title}</span>
 		</a>
 	</div>
 </article>

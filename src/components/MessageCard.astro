@@ -1,8 +1,7 @@
 ---
-import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import LanguageBadge from './LanguageBadge.astro';
-import { describe, formatDate, makeExcerpt, scriptLang, type Message } from '../lib/site';
+import { describe, formatDate, makeExcerpt, mediaUrl, scriptLang, type Message } from '../lib/site';
 
 interface Props {
 	message: Message;
@@ -19,7 +18,7 @@ const excerpt = isReading ? makeExcerpt(message.body ?? '') : '';
 		{
 			!isReading && (
 				<div class="thumb" data-kind={data.kind}>
-					{data.cover ? <Image src={data.cover} alt="" width={480} class="cover" /> : <Icon name={data.kind} size={44} />}
+					{data.cover ? <img src={mediaUrl(data.cover)} alt="" width="480" height="360" loading="lazy" class="cover" /> : <Icon name={data.kind} size={44} />}
 				</div>
 			)
 		}

@@ -6,7 +6,7 @@ import LanguageBadge from '../../components/LanguageBadge.astro';
 import MessageCard from '../../components/MessageCard.astro';
 import VideoPlayer from '../../components/VideoPlayer.astro';
 import Base from '../../layouts/Base.astro';
-import { byNewest, formatDate, KINDS, LANGUAGES, scriptLang, slugify } from '../../lib/site';
+import { byNewest, formatDate, KINDS, LANGUAGES, mediaUrl, scriptLang, slugify } from '../../lib/site';
 
 export async function getStaticPaths() {
 	const all = await getCollection('messages');
@@ -28,11 +28,15 @@ const related = [
 ]
 	.filter((m, i, list) => list.findIndex((x) => x.id === m.id) === i)
 	.slice(0, 3);
+const tracks = data.tracks?.map((track) => ({ ...track, src: mediaUrl(track.src) }));
+const videos = [data.video, ...(data.moreVideos ?? [])]
+	.filter((v): v is NonNullable<typeof v> => Boolean(v))
+	.map((v) => (v.provider === 'file' ? { ...v, src: mediaUrl(v.src), poster: v.poster ? mediaUrl(v.poster) : undefined } : v));
 const seriesHref = data.series ? `/series/${slugify(data.series)}/` : undefined;
 ---
 
 <Base title={data.title} description={`${KINDS[data.kind].label}: ${data.title}`}>
-	<article class="wrap section detail">
+	<article class="wrap section detail" data-pagefind-body>
 		<nav class="crumbs" aria-label="Breadcrumb">
 			<a href="/messages/">Messages</a>
 			{
@@ -62,18 +66,18 @@ const seriesHref = data.series ? `/series/${slugify(data.series)}/` : undefined;
 		</header>
 
 		{
-			data.tracks && data.tracks.length > 0 && (
+			tracks && tracks.length > 0 && (
 				<div class="media">
-					<AudioPlayer tracks={data.tracks} storageKey={message.id} />
+					<AudioPlayer tracks={tracks} storageKey={message.id} />
 				</div>
 			)
 		}
 		{
-			data.video && (
+			videos.map((video, index) => (
 				<div class="media">
-					<VideoPlayer video={data.video} title={data.title} />
+					<VideoPlayer video={video} title={videos.length > 1 ? `${data.title} (${index + 1} of ${videos.length})` : data.title} />
 				</div>
-			)
+			))
 		}
 
 		{
@@ -83,7 +87,7 @@ const seriesHref = data.series ? `/series/${slugify(data.series)}/` : undefined;
 					<ul>
 						{data.downloads.map((file) => (
 							<li>
-								<a class="btn secondary" href={file.href} download>
+								<a class="btn secondary" href={mediaUrl(file.href)} download>
 									<Icon name="download" size={18} />
 									{file.label}
 									{file.note && <span class="muted">({file.note})</span>}
@@ -104,7 +108,7 @@ const seriesHref = data.series ? `/series/${slugify(data.series)}/` : undefined;
 		}
 	</article>
 
-	<section class="wrap section" aria-labelledby="more-title">
+	<section class="wrap section" aria-labelledby="more-title" data-pagefind-ignore>
 		<div class="section-head">
 			<h2 id="more-title">More to explore</h2>
 			<a class="more-link" href="/messages/">All messages <Icon name="arrow" size={18} /></a>

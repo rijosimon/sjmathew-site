@@ -9,7 +9,7 @@ export const SITE = {
 	url: 'https://www.sjmathew.com',
 } as const;
 
-export type LanguageCode = 'ml' | 'en' | 'hi' | 'sw';
+export type LanguageCode = 'ml' | 'en' | 'hi' | 'sw' | 'pt' | 'ta' | 'si';
 
 /** `native` is what the language calls itself; it is set in its own script. */
 export const LANGUAGES: Record<LanguageCode, { name: string; native: string; lang: string }> = {
@@ -17,8 +17,11 @@ export const LANGUAGES: Record<LanguageCode, { name: string; native: string; lan
 	en: { name: 'English', native: 'English', lang: 'en' },
 	hi: { name: 'Hindi', native: 'हिन्दी', lang: 'hi' },
 	sw: { name: 'Swahili', native: 'Kiswahili', lang: 'sw' },
+	pt: { name: 'Portuguese', native: 'Português', lang: 'pt' },
+	ta: { name: 'Tamil', native: 'தமிழ்', lang: 'ta' },
+	si: { name: 'Sinhala', native: 'සිංහල', lang: 'si' },
 };
-export const LANGUAGE_ORDER: LanguageCode[] = ['ml', 'en', 'hi', 'sw'];
+export const LANGUAGE_ORDER: LanguageCode[] = ['ml', 'en', 'hi', 'sw', 'ta', 'pt', 'si'];
 
 export const KINDS = {
 	audio: { label: 'Audio', verb: 'Listen' },
@@ -31,7 +34,21 @@ export type Kind = keyof typeof KINDS;
 export function scriptLang(text: string, fallback = 'en'): string {
 	if (/[ഀ-ൿ]/.test(text)) return 'ml';
 	if (/[ऀ-ॿ]/.test(text)) return 'hi';
+	if (/[\u0B80-\u0BFF]/.test(text)) return 'ta';
+	if (/[\u0D80-\u0DFF]/.test(text)) return 'si';
 	return fallback;
+}
+
+/**
+ * Where the media library is served from. Set PUBLIC_MEDIA_BASE_URL at build time (for example
+ * the Spaces CDN address). In development `npm run dev:media` serves the local library at /media.
+ */
+const MEDIA_BASE = (import.meta.env.PUBLIC_MEDIA_BASE_URL ?? '/media').replace(/\/+$/, '');
+
+/** Turn a media key (`audio/ykt/class-08.mp3`) into a URL. Full URLs and root paths pass through. */
+export function mediaUrl(ref: string): string {
+	if (/^(https?:)?\/\//.test(ref) || ref.startsWith('/')) return ref;
+	return `${MEDIA_BASE}/${ref.split('/').map(encodeURIComponent).join('/')}`;
 }
 
 export function formatDate(date: Date): string {

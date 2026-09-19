@@ -27,16 +27,19 @@ const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
 		<meta property="og:type" content="website" />
 		{PREVIEW && <meta name="robots" content="noindex, nofollow" />}
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="alternate" type="application/rss+xml" title="Messages" href="/rss.xml" />
 		<Font cssVariable="--font-serif-latin" preload />
 		<Font cssVariable="--font-serif-ml" />
 		<Font cssVariable="--font-serif-hi" />
 		<Font cssVariable="--font-sans-latin" preload />
 		<Font cssVariable="--font-sans-ml" />
 		<Font cssVariable="--font-sans-hi" />
+		<Font cssVariable="--font-serif-ta" />
+		<Font cssVariable="--font-sans-ta" />
 	</head>
 	<body>
 		<a class="skip-link" href="#main">Skip to content</a>
-		{PREVIEW && <div class="preview-banner">Design preview: sample content and placeholder media. Not the live site.</div>}
+		{PREVIEW && <div class="preview-banner">Preview of the new site, still being finished. Not the live site.</div>}
 		<Header />
 		<main id="main">
 			<slot />

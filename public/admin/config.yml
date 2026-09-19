@@ -1,0 +1,167 @@
+# Decap CMS: a web editor that saves changes as commits to the GitHub repository.
+# Every commit to `main` redeploys the site (see docs/EDITING.md for the one-time setup).
+
+backend:
+  name: github
+  repo: rijosimon/sjmathew-site
+  branch: main
+  # The small login helper that talks to GitHub (see functions/ and docs/EDITING.md).
+  base_url: https://sjmathew-site-nla4u.ondigitalocean.app
+  auth_endpoint: api/auth
+
+# Only used when running `npm run cms` next to `npm run dev` on your own computer (no login needed).
+local_backend: true
+
+publish_mode: simple
+site_url: https://www.sjmathew.com
+display_url: https://www.sjmathew.com
+locale: en
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: messages
+    label: Messages
+    label_singular: Message
+    folder: src/content/messages
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{slug}}'
+    summary: '{{title}} ({{kind}}, {{date}})'
+    sortable_fields: [date, title]
+    view_filters:
+      - { label: Audio, field: kind, pattern: audio }
+      - { label: Video, field: kind, pattern: video }
+      - { label: Reading, field: kind, pattern: article }
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, date_format: 'YYYY-MM-DD', time_format: false, format: 'YYYY-MM-DD' }
+      - label: Languages
+        name: languages
+        widget: select
+        multiple: true
+        min: 1
+        options:
+          - { label: Malayalam, value: ml }
+          - { label: English, value: en }
+          - { label: Hindi, value: hi }
+          - { label: Swahili, value: sw }
+          - { label: Tamil, value: ta }
+          - { label: Portuguese, value: pt }
+          - { label: Sinhala, value: si }
+      - label: Type
+        name: kind
+        widget: select
+        options:
+          - { label: Audio (parts to listen to), value: audio }
+          - { label: Video, value: video }
+          - { label: Reading (article), value: article }
+      - { label: Series, name: series, widget: string, required: false, hint: 'Optional. Messages with the same series name are grouped together.' }
+      - { label: Cover picture, name: cover, widget: string, required: false, hint: 'File path in the media library, for example images/2014/07/wave.jpg' }
+      - label: Audio parts
+        name: tracks
+        widget: list
+        required: false
+        hint: 'Type = Audio. One row per part. The file path is the place of the MP3 in the media library.'
+        fields:
+          - { label: Part title, name: title, widget: string }
+          - { label: MP3 file path, name: src, widget: string, hint: 'For example audio/ykt/class-08.mp3' }
+      - label: Video
+        name: video
+        widget: object
+        required: false
+        hint: 'Type = Video. Use a YouTube video id or playlist id, or the path of an MP4 file.'
+        fields:
+          - label: Where the video is
+            name: provider
+            widget: select
+            options:
+              - { label: YouTube, value: youtube }
+              - { label: A file in the media library, value: file }
+          - { label: YouTube video id, name: id, widget: string, required: false, hint: 'The 11 characters after v= in the video address' }
+          - { label: YouTube playlist id, name: playlist, widget: string, required: false, hint: 'The text after list= in the playlist address' }
+          - { label: MP4 file path, name: src, widget: string, required: false }
+      - label: More videos
+        name: moreVideos
+        widget: list
+        required: false
+        fields:
+          - { label: Where the video is, name: provider, widget: select, options: [{ label: YouTube, value: youtube }, { label: File, value: file }] }
+          - { label: YouTube video id, name: id, widget: string, required: false }
+          - { label: YouTube playlist id, name: playlist, widget: string, required: false }
+          - { label: MP4 file path, name: src, widget: string, required: false }
+      - label: Downloads
+        name: downloads
+        widget: list
+        required: false
+        fields:
+          - { label: Button text, name: label, widget: string }
+          - { label: File path, name: href, widget: string, hint: 'For example downloads/audio/his-light-my-life.zip' }
+          - { label: Size or note, name: note, widget: string, required: false, hint: 'For example 49.7 MB' }
+      - label: Old website reference (leave as it is)
+        name: source
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { label: Old post number, name: wpId, widget: number, value_type: int }
+          - { label: Old address name, name: wpSlug, widget: string }
+          - { label: Old kind, name: wpType, widget: string, required: false }
+      - { label: Text, name: body, widget: markdown, required: false }
+
+  - name: library
+    label: Books and tracts
+    label_singular: Book or tract
+    folder: src/content/library
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{slug}}'
+    summary: '{{title}} ({{type}})'
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Date, name: date, widget: datetime, date_format: 'YYYY-MM-DD', time_format: false, format: 'YYYY-MM-DD' }
+      - label: Languages
+        name: languages
+        widget: select
+        multiple: true
+        min: 1
+        options:
+          - { label: Malayalam, value: ml }
+          - { label: English, value: en }
+          - { label: Hindi, value: hi }
+          - { label: Swahili, value: sw }
+          - { label: Tamil, value: ta }
+          - { label: Portuguese, value: pt }
+          - { label: Sinhala, value: si }
+      - label: Type
+        name: type
+        widget: select
+        options: [{ label: E-book, value: book }, { label: Tract, value: tract }]
+      - { label: File path, name: file, widget: string, hint: 'For example library/etracts/english/attention-travellers.pdf' }
+      - label: Old website reference (leave as it is)
+        name: source
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { label: Old post number, name: wpId, widget: number, value_type: int }
+          - { label: Old address name, name: wpSlug, widget: string }
+          - { label: Old kind, name: wpType, widget: string, required: false }
+
+  - name: pages
+    label: Pages
+    files:
+      - label: About
+        name: about
+        file: src/content/pages/about.md
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Text, name: body, widget: markdown }
+      - label: FAQ
+        name: faq
+        file: src/content/pages/faq.md
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: Text, name: body, widget: markdown }

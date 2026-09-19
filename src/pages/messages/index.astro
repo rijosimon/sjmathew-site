@@ -11,7 +11,7 @@ const groups = [
 	{
 		name: 'lang',
 		label: 'Language',
-		options: LANGUAGE_ORDER.map((code) => ({
+		options: LANGUAGE_ORDER.filter((code) => messages.some((m) => m.data.languages.includes(code))).map((code) => ({
 			value: code,
 			label: LANGUAGES[code].native,
 			lang: LANGUAGES[code].lang,
