@@ -7,7 +7,7 @@ example `audio/ykt/class-08.mp3`). `PUBLIC_MEDIA_BASE_URL` says where the Space 
 ## What is ready
 
 The old site's files were copied, renamed and converted on a Mac into
-`~/Workspace/sjmathew-media/out/` (about 85 GB, 900+ files). `data/media-map.json` lists every file
+`~/Workspace/sjmathew-media/out/` (about 90 GB, 1,045 files). `data/media-map.json` lists every file
 with its size and MD5 checksum. Only files that a published page links to were carried over
 (`data/media-report.md` explains what was left behind and why).
 
