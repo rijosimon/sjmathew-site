@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import MessageCard from '../../components/MessageCard.astro';
+import Base from '../../layouts/Base.astro';
+import { byNewest, slugify } from '../../lib/site';
+
+export async function getStaticPaths() {
+	const messages = await getCollection('messages');
+	const names = [...new Set(messages.map((m) => m.data.series).filter((s): s is string => Boolean(s)))];
+	return names.map((name) => ({
+		params: { slug: slugify(name) },
+		props: { name, items: messages.filter((m) => m.data.series === name).sort(byNewest) },
+	}));
+}
+
+const { name, items } = Astro.props;
+---
+
+<Base title={name} description={`Messages in the series ${name}.`}>
+	<div class="wrap section">
+		<header class="page-head">
+			<p class="eyebrow"><a href="/series/">Series</a></p>
+			<h1>{name}</h1>
+			<p class="lede muted">{items.length} messages</p>
+		</header>
+		<div class="grid">
+			{items.map((message) => <MessageCard message={message} />)}
+		</div>
+	</div>
+</Base>

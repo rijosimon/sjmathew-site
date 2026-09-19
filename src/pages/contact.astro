@@ -1,0 +1,88 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Details copied from the current site's Contact page. To be confirmed before launch.
+const contacts = [
+	{ place: 'Email', rows: [{ label: 'jesusmission@gmail.com', href: 'mailto:jesusmission@gmail.com' }] },
+	{
+		place: 'India',
+		rows: [
+			{ label: 'Kerala: 0469-2672310', href: 'tel:+914692672310' },
+			{ label: 'Mobile: 094471 72310', href: 'tel:+919447172310' },
+		],
+	},
+	{ place: 'East Africa', rows: [{ label: 'Mobile: 00255-7575-48677', href: 'tel:+255757548677' }] },
+];
+---
+
+<Base title="Contact" description="How to get in touch with Saju John Mathew.">
+	<div class="wrap section">
+		<header class="page-head">
+			<p class="eyebrow">Contact</p>
+			<h1>Get in touch</h1>
+			<p class="lede">
+				Saju welcomes invitations, questions and friendly notes. He is sometimes in places where email and phone do not
+				work, so replies can be slow.
+			</p>
+		</header>
+
+		<div class="cards">
+			{
+				contacts.map((group) => (
+					<section class="card">
+						<h2>{group.place}</h2>
+						<ul>
+							{group.rows.map((row) => (
+								<li>
+									<a href={row.href}>{row.label}</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</div>
+
+		<p class="alt">
+			While Saju is out of reach, write to <a href="mailto:jesusmissionupdates@gmail.com">jesusmissionupdates@gmail.com</a>
+			and your message will be forwarded to him.
+		</p>
+	</div>
+</Base>
+
+<style>
+	.cards {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+		max-width: 52rem;
+	}
+	.card {
+		padding: 1.1rem 1.25rem;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+	}
+	h2 {
+		font-size: 1.125rem;
+		margin-bottom: 0.6rem;
+	}
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	li a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.75rem;
+		overflow-wrap: anywhere;
+	}
+	.alt {
+		max-width: 52rem;
+		margin-top: 1.5rem;
+		padding: 1rem 1.25rem;
+		background: var(--accent-soft);
+		border-radius: var(--radius);
+	}
+</style>

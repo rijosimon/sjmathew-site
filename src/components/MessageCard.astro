@@ -1,0 +1,132 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import LanguageBadge from './LanguageBadge.astro';
+import { describe, formatDate, makeExcerpt, scriptLang, type Message } from '../lib/site';
+
+interface Props {
+	message: Message;
+}
+const { message } = Astro.props;
+const { data } = message;
+const titleLang = scriptLang(data.title);
+const isReading = data.kind === 'article';
+const excerpt = isReading ? makeExcerpt(message.body ?? '') : '';
+---
+
+<article class="card" data-lang={data.languages.join(' ')} data-kind={data.kind}>
+	<a class="card-link" href={`/messages/${message.id}/`}>
+		{
+			!isReading && (
+				<div class="thumb" data-kind={data.kind}>
+					{data.cover ? <Image src={data.cover} alt="" width={480} class="cover" /> : <Icon name={data.kind} size={44} />}
+				</div>
+			)
+		}
+		<div class="body">
+			<h3 lang={titleLang}>{data.title}</h3>
+			{excerpt && <p class="excerpt">{excerpt}</p>}
+			<p class="meta">
+				<span class="kind"><Icon name={data.kind} size={16} />{describe(message)}</span>
+				<span aria-hidden="true">·</span>
+				<time datetime={data.date.toISOString().slice(0, 10)}>{formatDate(data.date)}</time>
+			</p>
+			<p class="langs">
+				{data.languages.map((code) => <LanguageBadge code={code} />)}
+			</p>
+		</div>
+	</a>
+</article>
+
+<style>
+	.card {
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		overflow: hidden;
+		transition: box-shadow 0.15s, transform 0.15s;
+	}
+	.card:hover {
+		box-shadow: var(--shadow);
+		transform: translateY(-2px);
+	}
+	.card-link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		color: inherit;
+		text-decoration: none;
+	}
+	.thumb {
+		position: relative;
+		aspect-ratio: 4 / 3;
+		display: grid;
+		place-items: center;
+		background: var(--accent-soft);
+		color: var(--accent);
+		overflow: hidden;
+	}
+	.thumb[data-kind='video'] {
+		background: var(--surface-2);
+		color: var(--ink-2);
+	}
+	.thumb[data-kind='article'] {
+		background: var(--surface-2);
+	}
+	.thumb:has(.cover) {
+		background: var(--surface-2);
+	}
+	.cover {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	.kind {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		color: var(--accent);
+		font-weight: 600;
+	}
+	.excerpt {
+		margin: 0;
+		font-family: var(--serif);
+		font-size: 0.9375rem;
+		color: var(--ink-2);
+		display: -webkit-box;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.body {
+		padding: 0.9rem 1rem 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		flex: 1;
+	}
+	h3 {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.card-link:hover h3 {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+	.meta {
+		margin: 0;
+		display: flex;
+		gap: 0.4rem;
+		font-size: 0.875rem;
+		color: var(--ink-2);
+	}
+	.langs {
+		margin: auto 0 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.9rem;
+		padding-top: 0.4rem;
+	}
+</style>

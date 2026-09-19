@@ -1,0 +1,69 @@
+---
+import { SITE } from '../lib/site';
+---
+
+<footer class="site-footer">
+	<div class="wrap inner">
+		<div>
+			<p class="name">{SITE.name}</p>
+			<p class="muted">
+				These works are copyrighted, but you are free to copy them for non-commercial use. Free distribution is not only allowed, but
+				appreciated.
+			</p>
+		</div>
+		<nav aria-label="Footer">
+			<ul>
+				<li><a href="/messages/">Messages</a></li>
+				<li><a href="/library/">Books &amp; tracts</a></li>
+				<li><a href="/about/">About</a></li>
+				<li><a href="/contact/">Contact</a></li>
+			</ul>
+		</nav>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		margin-top: 3rem;
+		border-top: 1px solid var(--line);
+		background: var(--surface-2);
+	}
+	.inner {
+		display: grid;
+		gap: 1.5rem;
+		padding-block: 2rem;
+	}
+	@media (min-width: 48rem) {
+		.inner {
+			grid-template-columns: 1.4fr 1fr;
+			align-items: start;
+		}
+		nav {
+			justify-self: end;
+		}
+	}
+	.name {
+		font-family: var(--serif);
+		font-weight: 700;
+		font-size: 1.125rem;
+		margin: 0 0 0.4rem;
+	}
+	.muted {
+		margin: 0;
+		max-width: 38rem;
+		font-size: 0.9375rem;
+	}
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.25rem;
+	}
+	a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.75rem;
+	}
+</style>

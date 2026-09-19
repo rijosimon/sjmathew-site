@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { slugify } from '../../lib/site';
+
+const messages = await getCollection('messages');
+const counts = new Map<string, number>();
+for (const m of messages) {
+	if (m.data.series) counts.set(m.data.series, (counts.get(m.data.series) ?? 0) + 1);
+}
+const series = [...counts].map(([name, count]) => ({ name, count, href: `/series/${slugify(name)}/` }));
+---
+
+<Base title="Series" description="Messages grouped into series.">
+	<div class="wrap section">
+		<header class="page-head">
+			<p class="eyebrow">Series</p>
+			<h1>Messages grouped together</h1>
+		</header>
+		<ul class="list">
+			{
+				series.map((s) => (
+					<li>
+						<a href={s.href}>{s.name}</a>
+						<span class="muted">{s.count} messages</span>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</Base>
+
+<style>
+	.list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.75rem;
+		max-width: 36rem;
+	}
+	li {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.9rem 1rem;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+	}
+</style>

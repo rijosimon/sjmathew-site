@@ -1,0 +1,278 @@
+---
+import { PREVIEW } from '../lib/site';
+
+interface Props {
+	tracks: { title: string; src: string }[];
+	/** Used to remember where the listener stopped. */
+	storageKey: string;
+}
+const { tracks, storageKey } = Astro.props;
+const multiple = tracks.length > 1;
+---
+
+<audio-player data-key={storageKey} data-tracks={JSON.stringify(tracks)} class="player">
+	<p class="now">
+		<span class="now-label">Now playing</span>
+		<span class="now-title" data-now>{tracks[0]?.title}</span>
+	</p>
+	<audio controls preload="none" src={tracks[0]?.src}>
+		<a href={tracks[0]?.src}>Download the audio</a>
+	</audio>
+
+	<div class="controls">
+		<label class="speed">
+			Speed
+			<select data-speed>
+				<option value="0.75">0.75×</option>
+				<option value="1" selected>1×</option>
+				<option value="1.25">1.25×</option>
+				<option value="1.5">1.5×</option>
+				<option value="2">2×</option>
+			</select>
+		</label>
+		{
+			multiple && (
+				<>
+					<button type="button" class="btn secondary" data-prev>Previous part</button>
+					<button type="button" class="btn secondary" data-next>Next part</button>
+				</>
+			)
+		}
+	</div>
+
+	<p class="resume" data-resume hidden>
+		<span data-resume-text></span>
+		<button type="button" class="btn secondary" data-resume-go>Resume</button>
+	</p>
+
+	{
+		multiple && (
+			<ol class="tracks">
+				{tracks.map((track, index) => (
+					<li>
+						<button type="button" data-index={index} aria-current={index === 0 ? 'true' : undefined}>
+							<span class="n" aria-hidden="true">
+								{index + 1}
+							</span>
+							<span>{track.title}</span>
+						</button>
+					</li>
+				))}
+			</ol>
+		)
+	}
+	{PREVIEW && <p class="note">Placeholder audio: the real recordings replace this clip after the design is approved.</p>}
+</audio-player>
+
+<script>
+	interface Track {
+		title: string;
+		src: string;
+	}
+	interface Saved {
+		index: number;
+		time: number;
+	}
+
+	class AudioPlayer extends HTMLElement {
+		connectedCallback() {
+			const audio = this.querySelector('audio');
+			if (!audio) return;
+			const tracks: Track[] = JSON.parse(this.dataset.tracks ?? '[]');
+			const key = `sjm:audio:${this.dataset.key ?? ''}`;
+			const now = this.querySelector<HTMLElement>('[data-now]');
+			const rows = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-index]'));
+			const resume = this.querySelector<HTMLElement>('[data-resume]');
+			let index = 0;
+			let lastSaved = 0;
+
+			const read = (): Saved | null => {
+				try {
+					return JSON.parse(localStorage.getItem(key) ?? 'null');
+				} catch {
+					return null;
+				}
+			};
+			const write = (value: Saved) => {
+				try {
+					localStorage.setItem(key, JSON.stringify(value));
+				} catch {
+					/* storage unavailable: the player works without it */
+				}
+			};
+			const clock = (seconds: number) => {
+				const s = Math.floor(seconds);
+				return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+			};
+
+			const select = (next: number, play: boolean, time = 0) => {
+				const track = tracks[next];
+				if (!track) return;
+				index = next;
+				const speed = audio.playbackRate;
+				audio.src = track.src;
+				audio.playbackRate = speed;
+				if (time > 0) {
+					audio.addEventListener(
+						'loadedmetadata',
+						() => (audio.currentTime = Math.min(time, Math.max(audio.duration - 1, 0))),
+						{ once: true },
+					);
+				}
+				if (now) now.textContent = track.title;
+				rows.forEach((row, i) => row.setAttribute('aria-current', i === next ? 'true' : 'false'));
+				if (play) void audio.play();
+			};
+
+			this.addEventListener('click', (event) => {
+				const target = event.target as HTMLElement;
+				const row = target.closest<HTMLButtonElement>('[data-index]');
+				if (row) return select(Number(row.dataset.index), true);
+				if (target.closest('[data-next]')) return select(Math.min(index + 1, tracks.length - 1), true);
+				if (target.closest('[data-prev]')) return select(Math.max(index - 1, 0), true);
+				if (target.closest('[data-resume-go]')) {
+					const saved = read();
+					if (saved) select(saved.index, true, saved.time);
+					if (resume) resume.hidden = true;
+				}
+			});
+
+			this.querySelector<HTMLSelectElement>('[data-speed]')?.addEventListener('change', (event) => {
+				audio.playbackRate = Number((event.target as HTMLSelectElement).value);
+			});
+
+			audio.addEventListener('ended', () => {
+				if (index < tracks.length - 1) select(index + 1, true);
+			});
+			audio.addEventListener('timeupdate', () => {
+				const t = audio.currentTime;
+				if (Math.abs(t - lastSaved) >= 5) {
+					lastSaved = t;
+					write({ index, time: t });
+				}
+			});
+
+			const saved = read();
+			if (saved && saved.time > 10 && tracks[saved.index] && resume) {
+				const text = resume.querySelector<HTMLElement>('[data-resume-text]');
+				if (text) text.textContent = `You stopped at ${clock(saved.time)} in “${tracks[saved.index]?.title}”.`;
+				resume.hidden = false;
+			}
+		}
+	}
+	customElements.define('audio-player', AudioPlayer);
+</script>
+
+<style>
+	.player {
+		display: block;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+		padding: 1rem;
+	}
+	.now {
+		margin: 0 0 0.6rem;
+		display: flex;
+		flex-direction: column;
+	}
+	.now-label {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+	.now-title {
+		font-family: var(--serif);
+		font-size: 1.125rem;
+	}
+	audio {
+		width: 100%;
+		display: block;
+	}
+	.controls {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem;
+		margin-top: 0.75rem;
+	}
+	.speed {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9375rem;
+		margin-inline-end: auto;
+	}
+	.speed select {
+		min-height: 2.5rem;
+		font: inherit;
+		color: inherit;
+		background: var(--bg);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-sm);
+		padding: 0 0.5rem;
+	}
+	.controls .btn {
+		min-height: 2.5rem;
+		font-size: 0.9375rem;
+	}
+	.resume {
+		margin: 0.75rem 0 0;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.6rem 0.8rem;
+		background: var(--accent-soft);
+		border-radius: var(--radius-sm);
+		font-size: 0.9375rem;
+	}
+	.resume .btn {
+		min-height: 2.25rem;
+	}
+	.tracks {
+		list-style: none;
+		margin: 1rem 0 0;
+		padding: 0;
+		display: grid;
+		gap: 0.25rem;
+		max-height: 22rem;
+		overflow-y: auto;
+	}
+	.tracks button {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-height: 2.75rem;
+		padding: 0.4rem 0.75rem;
+		text-align: start;
+		font: inherit;
+		color: inherit;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+	}
+	.tracks button:hover {
+		background: var(--surface-2);
+	}
+	.tracks button[aria-current='true'] {
+		background: var(--accent-soft);
+		border-color: var(--accent);
+		font-weight: 600;
+	}
+	.n {
+		min-width: 1.5rem;
+		text-align: end;
+		color: var(--ink-2);
+		font-variant-numeric: tabular-nums;
+	}
+	.note {
+		margin: 0.9rem 0 0;
+		font-size: 0.8125rem;
+		color: var(--ink-2);
+	}
+</style>

@@ -1,0 +1,56 @@
+---
+interface Props {
+	name: 'audio' | 'video' | 'article' | 'book' | 'download' | 'arrow';
+	size?: number;
+}
+const { name, size = 20 } = Astro.props;
+---
+
+<svg
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width="1.75"
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+	focusable="false"
+>
+	{
+		name === 'audio' && (
+			<>
+				<path d="M4 15v-3a8 8 0 0 1 16 0v3" />
+				<rect x="3" y="14" width="4" height="7" rx="1.5" />
+				<rect x="17" y="14" width="4" height="7" rx="1.5" />
+			</>
+		)
+	}
+	{
+		name === 'video' && (
+			<>
+				<rect x="3" y="5" width="18" height="14" rx="3" />
+				<path d="M10 9.5v5l4.5-2.5z" />
+			</>
+		)
+	}
+	{
+		name === 'article' && (
+			<>
+				<path d="M6 3h9l4 4v14H6z" />
+				<path d="M14 3v5h5M9 13h7M9 17h7" />
+			</>
+		)
+	}
+	{
+		name === 'book' && (
+			<>
+				<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z" />
+				<path d="M5 17a3 3 0 0 1 3-3h11" />
+			</>
+		)
+	}
+	{name === 'download' && <path d="M12 4v11m0 0-4-4m4 4 4-4M5 20h14" />}
+	{name === 'arrow' && <path d="M5 12h14m-5-5 5 5-5 5" />}
+</svg>

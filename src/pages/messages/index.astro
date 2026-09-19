@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import Filters from '../../components/Filters.astro';
+import MessageCard from '../../components/MessageCard.astro';
+import Base from '../../layouts/Base.astro';
+import { byNewest, KINDS, LANGUAGE_ORDER, LANGUAGES } from '../../lib/site';
+
+const messages = (await getCollection('messages')).sort(byNewest);
+
+const groups = [
+	{
+		name: 'lang',
+		label: 'Language',
+		options: LANGUAGE_ORDER.map((code) => ({
+			value: code,
+			label: LANGUAGES[code].native,
+			lang: LANGUAGES[code].lang,
+		})),
+	},
+	{
+		name: 'kind',
+		label: 'Type',
+		options: (Object.keys(KINDS) as (keyof typeof KINDS)[]).map((kind) => ({
+			value: kind,
+			label: KINDS[kind].label,
+		})),
+	},
+];
+---
+
+<Base title="Messages" description="Audio and video messages and written readings, in Malayalam, English, Hindi and Swahili.">
+	<div class="wrap section">
+		<header class="page-head">
+			<p class="eyebrow">Messages</p>
+			<h1>Listen, watch and read</h1>
+			<p class="lede muted">Choose a language or a type, or just browse from the newest.</p>
+		</header>
+
+		<Filters groups={groups} target="#message-list" noun="messages" />
+		<div class="grid" id="message-list">
+			{messages.map((message) => <MessageCard message={message} />)}
+		</div>
+	</div>
+</Base>

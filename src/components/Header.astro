@@ -1,0 +1,87 @@
+---
+import { SITE } from '../lib/site';
+
+const nav = [
+	{ href: '/messages/', label: 'Messages' },
+	{ href: '/library/', label: 'Books & tracts' },
+	{ href: '/about/', label: 'About' },
+	{ href: '/contact/', label: 'Contact' },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href);
+---
+
+<header class="site-header">
+	<div class="wrap bar">
+		<a class="brand" href="/">{SITE.name}</a>
+		<nav aria-label="Main">
+			<ul>
+				{
+					nav.map((item) => (
+						<li>
+							<a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+								{item.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		border-bottom: 1px solid var(--line);
+		background: var(--bg);
+	}
+	.bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.25rem 1.5rem;
+		padding-block: 0.6rem;
+	}
+	.brand {
+		font-family: var(--serif);
+		font-weight: 700;
+		font-size: 1.25rem;
+		color: var(--ink);
+		text-decoration: none;
+		padding-block: 0.4rem;
+	}
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.1rem 0.25rem;
+	}
+	nav a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.75rem;
+		padding: 0 0.4rem;
+		font-size: 0.9375rem;
+		border-radius: 999px;
+		color: var(--ink);
+		text-decoration: none;
+		font-weight: 500;
+	}
+	nav a:hover {
+		background: var(--surface-2);
+	}
+	@media (min-width: 40rem) {
+		nav a {
+			padding: 0 0.75rem;
+			font-size: 1rem;
+		}
+	}
+	nav a[aria-current='page'] {
+		background: var(--accent-soft);
+		color: var(--accent);
+		font-weight: 600;
+	}
+</style>

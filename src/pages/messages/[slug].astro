@@ -1,0 +1,174 @@
+---
+import { getCollection, render } from 'astro:content';
+import AudioPlayer from '../../components/AudioPlayer.astro';
+import Icon from '../../components/Icon.astro';
+import LanguageBadge from '../../components/LanguageBadge.astro';
+import MessageCard from '../../components/MessageCard.astro';
+import VideoPlayer from '../../components/VideoPlayer.astro';
+import Base from '../../layouts/Base.astro';
+import { byNewest, formatDate, KINDS, LANGUAGES, scriptLang, slugify } from '../../lib/site';
+
+export async function getStaticPaths() {
+	const all = await getCollection('messages');
+	return all.map((message) => ({ params: { slug: message.id }, props: { message } }));
+}
+
+const { message } = Astro.props;
+const { data } = message;
+const { Content } = await render(message);
+const hasBody = Boolean(message.body?.trim());
+const titleLang = scriptLang(data.title);
+const bodyLang = LANGUAGES[data.languages[0] ?? 'en'].lang;
+
+const others = (await getCollection('messages')).filter((m) => m.id !== message.id).sort(byNewest);
+const related = [
+	...others.filter((m) => data.series && m.data.series === data.series),
+	...others.filter((m) => m.data.languages.some((l) => data.languages.includes(l))),
+	...others,
+]
+	.filter((m, i, list) => list.findIndex((x) => x.id === m.id) === i)
+	.slice(0, 3);
+const seriesHref = data.series ? `/series/${slugify(data.series)}/` : undefined;
+---
+
+<Base title={data.title} description={`${KINDS[data.kind].label}: ${data.title}`}>
+	<article class="wrap section detail">
+		<nav class="crumbs" aria-label="Breadcrumb">
+			<a href="/messages/">Messages</a>
+			{
+				seriesHref && (
+					<>
+						<span aria-hidden="true">/</span>
+						<a href={seriesHref}>{data.series}</a>
+					</>
+				)
+			}
+		</nav>
+
+		<header class="head">
+			<p class="meta">
+				<span class="pill"><Icon name={data.kind} size={16} />{KINDS[data.kind].label}</span>
+				{data.languages.map((code) => <LanguageBadge code={code} />)}
+				<time datetime={data.date.toISOString().slice(0, 10)}>{formatDate(data.date)}</time>
+			</p>
+			<h1 lang={titleLang}>{data.title}</h1>
+			{
+				seriesHref && (
+					<p class="muted">
+						Part of <a href={seriesHref}>{data.series}</a>
+					</p>
+				)
+			}
+		</header>
+
+		{
+			data.tracks && data.tracks.length > 0 && (
+				<div class="media">
+					<AudioPlayer tracks={data.tracks} storageKey={message.id} />
+				</div>
+			)
+		}
+		{
+			data.video && (
+				<div class="media">
+					<VideoPlayer video={data.video} title={data.title} />
+				</div>
+			)
+		}
+
+		{
+			data.downloads.length > 0 && (
+				<section class="downloads" aria-labelledby="downloads-title">
+					<h2 id="downloads-title">Downloads</h2>
+					<ul>
+						{data.downloads.map((file) => (
+							<li>
+								<a class="btn secondary" href={file.href} download>
+									<Icon name="download" size={18} />
+									{file.label}
+									{file.note && <span class="muted">({file.note})</span>}
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			)
+		}
+
+		{
+			hasBody && (
+				<div class="prose" lang={bodyLang}>
+					<Content />
+				</div>
+			)
+		}
+	</article>
+
+	<section class="wrap section" aria-labelledby="more-title">
+		<div class="section-head">
+			<h2 id="more-title">More to explore</h2>
+			<a class="more-link" href="/messages/">All messages <Icon name="arrow" size={18} /></a>
+		</div>
+		<div class="grid">
+			{related.map((m) => <MessageCard message={m} />)}
+		</div>
+	</section>
+</Base>
+
+<style>
+	.detail {
+		max-width: 52rem;
+		padding-bottom: 1rem;
+	}
+	.crumbs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		font-size: 0.9375rem;
+		color: var(--ink-2);
+		margin-bottom: 1.25rem;
+	}
+	.head {
+		margin-bottom: 1.5rem;
+	}
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem 1rem;
+		margin: 0 0 0.75rem;
+		font-size: 0.875rem;
+		color: var(--ink-2);
+	}
+	.pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.2rem 0.65rem;
+		border-radius: 999px;
+		background: var(--accent-soft);
+		color: var(--accent);
+		font-weight: 600;
+	}
+	.head p.muted {
+		margin: 0.6rem 0 0;
+	}
+	.media {
+		margin-bottom: 1.5rem;
+	}
+	.downloads {
+		margin-bottom: 2rem;
+	}
+	.downloads h2 {
+		font-size: 1.125rem;
+		margin-bottom: 0.75rem;
+	}
+	.downloads ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+	}
+</style>

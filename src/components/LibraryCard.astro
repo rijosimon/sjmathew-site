@@ -1,0 +1,73 @@
+---
+import Icon from './Icon.astro';
+import LanguageBadge from './LanguageBadge.astro';
+import { scriptLang, type LibraryItem } from '../lib/site';
+
+interface Props {
+	item: LibraryItem;
+}
+const { item } = Astro.props;
+const { data } = item;
+---
+
+<article class="item" data-lang={data.languages.join(' ')} data-kind={data.type}>
+	<div class="cover" aria-hidden="true">
+		<Icon name="book" size={34} />
+		<span>{data.type === 'book' ? 'E-book' : 'Tract'}</span>
+	</div>
+	<div class="body">
+		<h3 lang={scriptLang(data.title)}>{data.title}</h3>
+		<p class="langs">
+			{data.languages.map((code) => <LanguageBadge code={code} />)}
+		</p>
+		<a class="btn secondary" href={data.file} download>
+			<Icon name="download" size={18} />Download PDF<span class="sr-only">: {data.title}</span>
+		</a>
+	</div>
+</article>
+
+<style>
+	.item {
+		display: grid;
+		grid-template-columns: 5.5rem 1fr;
+		gap: 1rem;
+		padding: 1rem;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: var(--radius);
+	}
+	.cover {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		aspect-ratio: 3 / 4;
+		background: var(--accent-soft);
+		color: var(--accent);
+		border-radius: var(--radius-sm);
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+	.body {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.6rem;
+		min-width: 0;
+	}
+	h3 {
+		overflow-wrap: anywhere;
+	}
+	.langs {
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.9rem;
+	}
+	.btn {
+		margin-top: auto;
+		min-height: 2.5rem;
+		font-size: 0.9375rem;
+	}
+</style>

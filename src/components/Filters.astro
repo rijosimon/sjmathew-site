@@ -1,0 +1,130 @@
+---
+interface Group {
+	/** Matches a `data-<name>` attribute on each item, e.g. "lang" or "kind". */
+	name: string;
+	label: string;
+	options: { value: string; label: string; lang?: string }[];
+}
+interface Props {
+	groups: Group[];
+	/** CSS selector of the list whose direct children are filtered. */
+	target: string;
+	noun?: string;
+}
+const { groups, target, noun = 'items' } = Astro.props;
+---
+
+<search-filters class="filters" data-target={target} data-noun={noun}>
+	{
+		groups.map((group) => (
+			<div class="group" role="group" aria-label={group.label}>
+				<span class="group-label" aria-hidden="true">
+					{group.label}
+				</span>
+				<button type="button" class="chip" data-group={group.name} data-value="" aria-pressed="true">
+					All
+				</button>
+				{group.options.map((option) => (
+					<button
+						type="button"
+						class="chip"
+						data-group={group.name}
+						data-value={option.value}
+						aria-pressed="false"
+						lang={option.lang}
+					>
+						{option.label}
+					</button>
+				))}
+			</div>
+		))
+	}
+	<p class="count" role="status" data-count></p>
+</search-filters>
+<p class="empty" data-empty hidden>Nothing matches those filters yet. Try choosing “All”.</p>
+
+<script>
+	class SearchFilters extends HTMLElement {
+		connectedCallback() {
+			const list = document.querySelector<HTMLElement>(this.dataset.target ?? '');
+			if (!list) return;
+			const noun = this.dataset.noun ?? 'items';
+			const items = Array.from(list.children) as HTMLElement[];
+			const count = this.querySelector<HTMLElement>('[data-count]');
+			const empty = document.querySelector<HTMLElement>('[data-empty]');
+			const buttons = Array.from(this.querySelectorAll<HTMLButtonElement>('.chip'));
+			const groups = [...new Set(buttons.map((b) => b.dataset.group ?? ''))];
+
+			const state: Record<string, string> = {};
+			const params = new URLSearchParams(location.search);
+			for (const g of groups) {
+				const wanted = params.get(g) ?? '';
+				const known = buttons.some((b) => b.dataset.group === g && b.dataset.value === wanted);
+				state[g] = known ? wanted : '';
+			}
+
+			const apply = () => {
+				let shown = 0;
+				for (const item of items) {
+					const match = groups.every((g) => {
+						const value = state[g];
+						if (!value) return true;
+						return (item.dataset[g] ?? '').split(' ').includes(value);
+					});
+					item.hidden = !match;
+					if (match) shown++;
+				}
+				for (const b of buttons) {
+					b.setAttribute('aria-pressed', String(state[b.dataset.group ?? ''] === (b.dataset.value ?? '')));
+				}
+				if (count) count.textContent = `Showing ${shown} of ${items.length} ${noun}`;
+				if (empty) empty.hidden = shown !== 0;
+				const next = new URLSearchParams();
+				for (const g of groups) if (state[g]) next.set(g, state[g]);
+				const query = next.toString();
+				history.replaceState(null, '', query ? `?${query}` : location.pathname);
+			};
+
+			this.addEventListener('click', (event) => {
+				const button = (event.target as HTMLElement).closest<HTMLButtonElement>('.chip');
+				if (!button) return;
+				state[button.dataset.group ?? ''] = button.dataset.value ?? '';
+				apply();
+			});
+			apply();
+		}
+	}
+	customElements.define('search-filters', SearchFilters);
+</script>
+
+<style>
+	.filters {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 1.25rem;
+	}
+	.group {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	.group-label {
+		min-width: 5.5rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--ink-2);
+	}
+	.count {
+		margin: 0;
+		font-size: 0.875rem;
+		color: var(--ink-2);
+	}
+	.empty {
+		padding: 2rem 0;
+		color: var(--ink-2);
+	}
+</style>

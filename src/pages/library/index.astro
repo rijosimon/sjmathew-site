@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import Filters from '../../components/Filters.astro';
+import LibraryCard from '../../components/LibraryCard.astro';
+import Base from '../../layouts/Base.astro';
+import { byNewest, LANGUAGE_ORDER, LANGUAGES } from '../../lib/site';
+
+const items = (await getCollection('library')).sort(byNewest);
+const groups = [
+	{
+		name: 'lang',
+		label: 'Language',
+		options: LANGUAGE_ORDER.map((code) => ({
+			value: code,
+			label: LANGUAGES[code].native,
+			lang: LANGUAGES[code].lang,
+		})),
+	},
+	{
+		name: 'kind',
+		label: 'Type',
+		options: [
+			{ value: 'book', label: 'E-books' },
+			{ value: 'tract', label: 'Tracts' },
+		],
+	},
+];
+---
+
+<Base title="Books & tracts" description="Free e-books and tracts to download, in several languages.">
+	<div class="wrap section">
+		<header class="page-head">
+			<p class="eyebrow">Library</p>
+			<h1>E-books and tracts</h1>
+			<p class="lede muted">Free to download, read and share.</p>
+		</header>
+
+		<Filters groups={groups} target="#library-list" noun="items" />
+		<div class="grid wide" id="library-list">
+			{items.map((item) => <LibraryCard item={item} />)}
+		</div>
+	</div>
+</Base>

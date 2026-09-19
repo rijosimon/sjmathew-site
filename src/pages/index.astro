@@ -1,0 +1,131 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from '../components/Icon.astro';
+import LibraryCard from '../components/LibraryCard.astro';
+import MessageCard from '../components/MessageCard.astro';
+import Base from '../layouts/Base.astro';
+import { byNewest, LANGUAGE_ORDER, LANGUAGES, SITE } from '../lib/site';
+
+const messages = (await getCollection('messages')).sort(byNewest);
+const latest = messages.filter((m) => m.data.kind !== 'article').slice(0, 4);
+const reading = messages.filter((m) => m.data.kind === 'article').slice(0, 2);
+const library = (await getCollection('library')).sort(byNewest).slice(0, 4);
+const tiles = LANGUAGE_ORDER.map((code) => ({
+	code,
+	...LANGUAGES[code],
+	count: messages.filter((m) => m.data.languages.includes(code)).length,
+}));
+---
+
+<Base>
+	<section class="hero wrap">
+		<p class="eyebrow">Bible teacher · Jesus Mission India</p>
+		<h1>{SITE.tagline}</h1>
+		<p class="lede">
+			By {SITE.name}, in Malayalam, English, Hindi and Swahili. Everything here is free.
+		</p>
+		<p class="actions">
+			<a class="btn" href="/messages/">Browse messages <Icon name="arrow" size={18} /></a>
+			<a class="btn secondary" href="/library/">Books &amp; tracts</a>
+		</p>
+	</section>
+
+	<section class="wrap section" aria-labelledby="languages-title">
+		<h2 id="languages-title" class="sr-only">Choose a language</h2>
+		<ul class="tiles">
+			{
+				tiles.map((tile) => (
+					<li>
+						<a class="tile" href={`/messages/?lang=${tile.code}`} style={`--c: var(--lang-${tile.code})`}>
+							<span class="native" lang={tile.lang}>
+								{tile.native}
+							</span>
+							<span class="tile-meta">
+								{tile.name} · {tile.count} {tile.count === 1 ? 'message' : 'messages'}
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+
+	<section class="wrap section" aria-labelledby="latest-title">
+		<div class="section-head">
+			<h2 id="latest-title">Latest to listen to and watch</h2>
+			<a class="more-link" href="/messages/">All messages <Icon name="arrow" size={18} /></a>
+		</div>
+		<div class="grid">
+			{latest.map((message) => <MessageCard message={message} />)}
+		</div>
+	</section>
+
+	<section class="wrap section" aria-labelledby="read-title">
+		<div class="section-head">
+			<h2 id="read-title">To read</h2>
+			<a class="more-link" href="/messages/?kind=article">All readings <Icon name="arrow" size={18} /></a>
+		</div>
+		<div class="grid">
+			{reading.map((message) => <MessageCard message={message} />)}
+		</div>
+	</section>
+
+	<section class="wrap section" aria-labelledby="library-title">
+		<div class="section-head">
+			<h2 id="library-title">E-books and tracts</h2>
+			<a class="more-link" href="/library/">Whole library <Icon name="arrow" size={18} /></a>
+		</div>
+		<div class="grid wide">
+			{library.map((item) => <LibraryCard item={item} />)}
+		</div>
+	</section>
+</Base>
+
+<style>
+	.hero {
+		padding-block: clamp(2.5rem, 1.5rem + 5vw, 5rem) clamp(1rem, 0.5rem + 2vw, 2rem);
+	}
+	.hero h1 {
+		max-width: 22ch;
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin: 1.5rem 0 0;
+	}
+	.tiles {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 0.75rem;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+	}
+	.tile {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+		height: 100%;
+		padding: 1rem 1.1rem;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-inline-start: 5px solid var(--c);
+		border-radius: var(--radius);
+		color: var(--ink);
+		text-decoration: none;
+	}
+	.tile:hover {
+		box-shadow: var(--shadow);
+	}
+	.native {
+		font-family: var(--serif);
+		font-size: clamp(1.25rem, 1rem + 1vw, 1.5rem);
+		font-weight: 700;
+		line-height: 1.4;
+	}
+	.tile-meta {
+		font-size: 0.875rem;
+		color: var(--ink-2);
+	}
+</style>

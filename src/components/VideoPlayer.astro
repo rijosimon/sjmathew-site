@@ -1,0 +1,133 @@
+---
+import { PREVIEW, type Message } from '../lib/site';
+
+interface Props {
+	video: NonNullable<Message['data']['video']>;
+	title: string;
+}
+const { video, title } = Astro.props;
+
+const watchUrl =
+	video.provider === 'youtube'
+		? video.playlist
+			? `https://www.youtube.com/playlist?list=${video.playlist}`
+			: `https://www.youtube.com/watch?v=${video.id}`
+		: undefined;
+---
+
+{
+	video.provider === 'file' ? (
+		<div class="frame">
+			<video controls preload="metadata" playsinline poster={video.poster} src={video.src}>
+				<a href={video.src}>Download the video</a>
+			</video>
+			{PREVIEW && <p class="note">Placeholder video: the real recording replaces this clip after the design is approved.</p>}
+		</div>
+	) : (
+		<div class="frame">
+			<lite-youtube data-id={video.id} data-playlist={video.playlist} data-title={title}>
+				<button type="button" class="poster" aria-label={`Play video: ${title}`}>
+					{video.id && <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" />}
+					<span class="play" aria-hidden="true">
+						<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M8 5.5v13l11-6.5z" />
+						</svg>
+					</span>
+					{video.playlist && <span class="label">Playlist</span>}
+				</button>
+			</lite-youtube>
+			<p class="note">
+				Plays from YouTube when you press play.{' '}
+				<a href={watchUrl} rel="noopener">Open on YouTube</a>
+			</p>
+		</div>
+	)
+}
+
+<script>
+	class LiteYoutube extends HTMLElement {
+		connectedCallback() {
+			this.querySelector('button')?.addEventListener('click', () => {
+				const { id, playlist, title } = this.dataset;
+				const src = playlist
+					? `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(playlist)}&autoplay=1&rel=0`
+					: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id ?? '')}?autoplay=1&rel=0`;
+				const frame = document.createElement('iframe');
+				frame.src = src;
+				frame.title = title ?? 'Video';
+				frame.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+				frame.allowFullscreen = true;
+				this.replaceChildren(frame);
+			});
+		}
+	}
+	customElements.define('lite-youtube', LiteYoutube);
+</script>
+
+<style>
+	.frame {
+		max-width: 100%;
+	}
+	lite-youtube,
+	video {
+		display: block;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		background: #000;
+		border-radius: var(--radius);
+		overflow: hidden;
+	}
+	lite-youtube :global(iframe) {
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+	.poster {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		border: 0;
+		cursor: pointer;
+		color: #fff;
+		background: linear-gradient(135deg, #1f3a3c, #14120f);
+	}
+	.poster img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.play {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 4.25rem;
+		height: 4.25rem;
+		border-radius: 50%;
+		background: rgb(0 0 0 / 0.65);
+		border: 2px solid #fff;
+	}
+	.poster:hover .play {
+		background: var(--accent);
+		color: var(--accent-ink);
+	}
+	.label {
+		position: absolute;
+		left: 0.75rem;
+		bottom: 0.75rem;
+		padding: 0.15rem 0.6rem;
+		border-radius: 999px;
+		background: rgb(0 0 0 / 0.65);
+		font-size: 0.8125rem;
+		font-weight: 600;
+	}
+	.note {
+		margin: 0.6rem 0 0;
+		font-size: 0.8125rem;
+		color: var(--ink-2);
+	}
+</style>

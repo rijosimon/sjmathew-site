@@ -1,0 +1,31 @@
+---
+import { LANGUAGES, type LanguageCode } from '../lib/site';
+
+interface Props {
+	code: LanguageCode;
+}
+const { code } = Astro.props;
+const language = LANGUAGES[code];
+---
+
+<span class="badge">
+	<span class="dot" style={`--c: var(--lang-${code})`} aria-hidden="true"></span>
+	<span lang={language.lang}>{language.native}</span>
+</span>
+
+<style>
+	.badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.8125rem;
+		color: var(--ink-2);
+		white-space: nowrap;
+	}
+	.dot {
+		width: 0.6rem;
+		height: 0.6rem;
+		border-radius: 50%;
+		background: var(--c);
+	}
+</style>

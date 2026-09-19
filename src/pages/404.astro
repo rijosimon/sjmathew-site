@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Page not found">
+	<div class="wrap section">
+		<p class="eyebrow">404</p>
+		<h1>We could not find that page</h1>
+		<p class="lede muted">The address may have changed. You can start again from the messages or the library.</p>
+		<p class="actions">
+			<a class="btn" href="/messages/">Browse messages</a>
+			<a class="btn secondary" href="/library/">Books &amp; tracts</a>
+		</p>
+	</div>
+</Base>
+
+<style>
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 1.5rem;
+	}
+</style>

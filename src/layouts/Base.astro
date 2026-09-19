@@ -1,0 +1,46 @@
+---
+import { Font } from 'astro:assets';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { PREVIEW, SITE } from '../lib/site';
+import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+	/** Language of the page's own text (defaults to English). */
+	lang?: string;
+}
+const { title, description = SITE.tagline, lang = 'en' } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
+---
+
+<!doctype html>
+<html lang={lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		{PREVIEW && <meta name="robots" content="noindex, nofollow" />}
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<Font cssVariable="--font-serif-latin" preload />
+		<Font cssVariable="--font-serif-ml" />
+		<Font cssVariable="--font-serif-hi" />
+		<Font cssVariable="--font-sans-latin" preload />
+		<Font cssVariable="--font-sans-ml" />
+		<Font cssVariable="--font-sans-hi" />
+	</head>
+	<body>
+		<a class="skip-link" href="#main">Skip to content</a>
+		{PREVIEW && <div class="preview-banner">Design preview: sample content and placeholder media. Not the live site.</div>}
+		<Header />
+		<main id="main">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>
