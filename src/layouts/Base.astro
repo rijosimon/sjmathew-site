@@ -26,7 +26,10 @@ const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
 		{PREVIEW && <meta name="robots" content="noindex, nofollow" />}
-		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
+		<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="alternate" type="application/rss+xml" title="Messages" href="/rss.xml" />
 		<Font cssVariable="--font-serif-latin" preload />
 		<Font cssVariable="--font-serif-ml" />
