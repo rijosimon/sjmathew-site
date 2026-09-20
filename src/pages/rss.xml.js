@@ -6,7 +6,7 @@ export async function GET(context) {
 	const messages = (await getCollection('messages')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 	return rss({
 		title: 'Saju John Mathew: messages',
-		description: 'Recorded messages and readings, free to listen to, read and share.',
+		description: 'Biblical messages and readings from the ministry of Saju John Mathew.',
 		site: context.site,
 		items: messages.map((message) => ({
 			title: message.data.title,

@@ -23,9 +23,7 @@ const tiles = LANGUAGE_ORDER.map((code) => ({
 		<div class="hero-text">
 			<p class="eyebrow">Bible teacher · Jesus Mission India</p>
 			<h1>{SITE.tagline}</h1>
-			<p class="lede">
-				By {SITE.name}, in Malayalam, English, Hindi, Swahili and other languages. Everything here is free.
-			</p>
+			<p class="lede">{SITE.intro}</p>
 			<form class="home-search" role="search" action="/messages/" method="get">
 				<label class="sr-only" for="home-q">Search messages and readings</label>
 				<span class="home-search-icon"><Icon name="search" size={18} /></span>

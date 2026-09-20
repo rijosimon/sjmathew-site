@@ -3,9 +3,16 @@ import type { CollectionEntry } from 'astro:content';
 /** Shown as a banner and used to add noindex while this is only a design preview. */
 export const PREVIEW = true;
 
+const NAME = 'Saju John Mathew';
+
 export const SITE = {
-	name: 'Saju John Mathew',
-	tagline: 'Recorded messages and e-books, free to listen to, read and share.',
+	name: NAME,
+	/** The home page headline. */
+	tagline: 'Biblical Messages to listen to, watch and read.',
+	/** The line under the headline. */
+	intro: `From the ministry of ${NAME}, in Malayalam, English, Hindi, Kiswahili and more, plus e-books and tracts to download. Everything is free.`,
+	/** For search results and link previews. */
+	description: `Biblical messages from the ministry of ${NAME}, in Malayalam, English, Hindi and more. E-books and tracts too. Everything is free.`,
 	url: 'https://www.sjmathew.com',
 } as const;
 

@@ -11,7 +11,7 @@ interface Props {
 	/** Language of the page's own text (defaults to English). */
 	lang?: string;
 }
-const { title, description = SITE.tagline, lang = 'en' } = Astro.props;
+const { title, description = SITE.description, lang = 'en' } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
 ---
 
