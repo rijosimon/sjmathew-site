@@ -16,7 +16,10 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 	<div class="wrap bar">
 		<a class="brand" href="/">{SITE.name}</a>
 		<div class="theme"><ThemeToggle /></div>
-		<nav aria-label="Main">
+		<button class="menu-button" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-menu">
+			<span class="bars" aria-hidden="true"><span></span><span></span><span></span></span>
+		</button>
+		<nav id="site-menu" aria-label="Main">
 			<ul>
 				{
 					nav.map((item) => (
@@ -32,12 +35,47 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 	</div>
 </header>
 
+<!-- Plain inline script so the menu is already closed on phones before the first paint. Without JavaScript
+     the menu simply stays open and the button never appears. -->
+<script is:inline>
+	(function () {
+		var header = document.querySelector('.site-header');
+		var button = header && header.querySelector('.menu-button');
+		if (!header || !button) return;
+		var small = matchMedia('(max-width: 47.99rem)');
+		function set(open) {
+			header.dataset.menu = open ? 'open' : 'closed';
+			button.setAttribute('aria-expanded', String(open));
+		}
+		set(false);
+		button.addEventListener('click', function () {
+			set(header.dataset.menu !== 'open');
+		});
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape' && header.dataset.menu === 'open') {
+				set(false);
+				button.focus();
+			}
+		});
+		document.addEventListener('click', function (event) {
+			if (header.dataset.menu === 'open' && !header.contains(event.target)) set(false);
+		});
+		// Back to a wide screen (for example a phone turned sideways): start closed next time.
+		small.addEventListener('change', function (event) {
+			if (!event.matches) set(false);
+		});
+		window.addEventListener('resize', function () {
+			if (!small.matches && header.dataset.menu === 'open') set(false);
+		});
+	})();
+</script>
+
 <style>
 	.site-header {
 		border-bottom: 1px solid var(--line);
 		background: var(--bg);
 	}
-	/* Phones and tablets: title and switch share the first row, the menu sits below. */
+	/* Title and switch share the first row; the menu sits below. */
 	.bar {
 		display: flex;
 		flex-wrap: wrap;
@@ -59,8 +97,11 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 		order: 2;
 	}
 	nav {
-		order: 3;
+		order: 4;
 		flex-basis: 100%;
+	}
+	.menu-button {
+		display: none; /* only on phones, and only once the script is running */
 	}
 	/* Wide screens: title, menu and switch on one row. */
 	@media (min-width: 60rem) {
@@ -104,5 +145,103 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 		background: var(--accent-soft);
 		color: var(--accent);
 		font-weight: 600;
+	}
+
+	/* ---- Phones and small tablets: the menu folds into a hamburger button ---- */
+	@media (max-width: 47.99rem) {
+		.bar {
+			column-gap: 0.5rem;
+		}
+		.site-header[data-menu] .menu-button {
+			order: 3;
+			display: inline-grid;
+			place-items: center;
+			width: 2.75rem;
+			height: 2.75rem;
+			margin-inline-start: -0.25rem; /* sits close to the theme switch */
+			padding: 0;
+			color: var(--ink);
+			background: none;
+			border: 0;
+			border-radius: 50%;
+			cursor: pointer;
+		}
+		.site-header[data-menu] .menu-button:hover {
+			background: var(--surface-2);
+		}
+		.site-header[data-menu='closed'] nav {
+			display: none;
+		}
+		.site-header[data-menu='open'] nav {
+			animation: menu-in 0.18s ease-out;
+		}
+		.site-header[data-menu] nav {
+			padding-bottom: 0.5rem;
+		}
+		.site-header[data-menu] ul {
+			flex-direction: column;
+			gap: 0.15rem;
+		}
+		.site-header[data-menu] nav a {
+			display: flex;
+			min-height: 3rem;
+			padding: 0 0.9rem;
+			font-size: 1.0625rem;
+			border-radius: var(--radius-sm);
+		}
+	}
+	@keyframes menu-in {
+		from {
+			opacity: 0;
+			transform: translateY(-6px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* The three bars turn into a cross while the menu is open. */
+	.bars {
+		position: relative;
+		display: block;
+		width: 1.25rem;
+		height: 1rem;
+	}
+	.bars span {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		border-radius: 2px;
+		background: currentColor;
+		transition: transform 0.2s ease, opacity 0.15s ease, top 0.2s ease;
+	}
+	.bars span:nth-child(1) {
+		top: 0;
+	}
+	.bars span:nth-child(2) {
+		top: calc(50% - 1px);
+	}
+	.bars span:nth-child(3) {
+		top: calc(100% - 2px);
+	}
+	.menu-button[aria-expanded='true'] .bars span:nth-child(1) {
+		top: calc(50% - 1px);
+		transform: rotate(45deg);
+	}
+	.menu-button[aria-expanded='true'] .bars span:nth-child(2) {
+		opacity: 0;
+	}
+	.menu-button[aria-expanded='true'] .bars span:nth-child(3) {
+		top: calc(50% - 1px);
+		transform: rotate(-45deg);
+	}
+
+	/* Very small phones: keep the title, switch and button on one line. */
+	@media (max-width: 22rem) {
+		.brand {
+			font-size: 1.2rem;
+		}
 	}
 </style>
