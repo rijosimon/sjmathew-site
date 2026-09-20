@@ -8,11 +8,11 @@ const NAME = 'Saju John Mathew';
 export const SITE = {
 	name: NAME,
 	/** The home page headline. */
-	tagline: 'Biblical Messages to listen to, watch and read.',
+	tagline: 'Biblical Messages to draw you closer to Jesus.',
 	/** The line under the headline. */
-	intro: `From the ministry of ${NAME}, in Malayalam, English, Hindi, Kiswahili and more. Everything is free.`,
+	intro: `From the ministry of ${NAME}: listen, watch and read, in Malayalam, English, Hindi, Kiswahili and more. Everything is free.`,
 	/** For search results and link previews. */
-	description: `Biblical messages from the ministry of ${NAME}, in Malayalam, English, Hindi and more. E-books and tracts too. Everything is free.`,
+	description: `Biblical messages from the ministry of ${NAME} to draw you closer to Jesus, in Malayalam, English, Hindi and more. Everything is free.`,
 	url: 'https://www.sjmathew.com',
 } as const;
 
