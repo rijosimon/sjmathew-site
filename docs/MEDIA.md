@@ -43,13 +43,15 @@ with its size and MD5 checksum. Only files that a published page links to were c
    endpoint = sgp1.digitaloceanspaces.com
    acl = public-read
    ```
-   Test it: `rclone lsd sjmathew:` should list `sjmathew-media`.
+   Test it with the bucket's name: `rclone lsd sjmathew:sjmathew-media` should finish without an error.
+   (`rclone lsd sjmathew:` on its own can fail with 403 AccessDenied when the key is limited to one
+   bucket; that is expected.)
 
 ## Upload
 
 ```bash
 caffeinate -i rclone copy ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media \
-  --transfers 8 --checksum --progress \
+  --s3-no-check-bucket --s3-chunk-size 32M --transfers 8 --checksum --progress \
   --header-upload "Cache-Control: public, max-age=31536000"
 ```
 
@@ -57,7 +59,7 @@ caffeinate -i rclone copy ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media
 depending on your upload speed. Then confirm nothing is missing or damaged:
 
 ```bash
-rclone check ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media --one-way
+rclone check ~/Workspace/sjmathew-media/out sjmathew:sjmathew-media --one-way --s3-no-check-bucket
 ```
 
 ## Connect the site

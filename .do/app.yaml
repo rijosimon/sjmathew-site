@@ -9,4 +9,8 @@ static_sites:
     environment_slug: node-js
     build_command: npm ci && npm run build
     output_dir: dist
+    envs:
+      - key: PUBLIC_MEDIA_BASE_URL
+        value: https://sjmathew-media.sgp1.cdn.digitaloceanspaces.com
+        scope: BUILD_TIME
     error_document: 404.html
