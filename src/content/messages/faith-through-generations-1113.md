@@ -4,7 +4,7 @@ date: 2012-11-17
 languages: ["ml"]
 kind: "video"
 video: {"provider": "file", "src": "video/vt/01-kanaanya-kristhiyaanikalum-haaranya-kristhyanikalum.mp4"}
-moreVideos: [{"provider": "file", "src": "video/vt/02-haaran-vittu-purappeduka.mp4"}, {"provider": "file", "src": "video/vt/03-anusaranathodu-koodiya-anugamanam.mp4"}, {"provider": "file", "src": "video/vt/04-the-real-blessing.mp4"}, {"provider": "file", "src": "video/vt/05-spiritual-growth.mp4"}, {"provider": "file", "src": "video/vt/06-my-god-and-my-lord.mp4"}, {"provider": "file", "src": "video/vt/08-spiritual-discipline.mp4"}, {"provider": "file", "src": "video/vt/09-leave-what-is-in-between-you-and-god.mp4"}, {"provider": "file", "src": "video/vt/10-yaagaarppanam.mp4"}, {"provider": "file", "src": "video/vt/11-destroying-future-for-present.mp4"}, {"provider": "file", "src": "video/vt/12-israel.mp4"}]
+moreVideos: [{"provider": "file", "src": "video/vt/02-haaran-vittu-purappeduka.mp4"}, {"provider": "file", "src": "video/vt/03-anusaranathodu-koodiya-anugamanam.mp4"}, {"provider": "file", "src": "video/vt/04-the-real-blessing.mp4"}, {"provider": "file", "src": "video/vt/05-spiritual-growth.mp4"}, {"provider": "file", "src": "video/vt/06-my-god-and-my-lord.mp4"}, {"provider": "file", "src": "video/vt/07-gods-time.mp4"}, {"provider": "file", "src": "video/vt/08-spiritual-discipline.mp4"}, {"provider": "file", "src": "video/vt/09-leave-what-is-in-between-you-and-god.mp4"}, {"provider": "file", "src": "video/vt/10-yaagaarppanam.mp4"}, {"provider": "file", "src": "video/vt/11-destroying-future-for-present.mp4"}, {"provider": "file", "src": "video/vt/12-israel.mp4"}]
 source: {"wpId": 1113, "wpSlug": "faith-through", "wpType": "page"}
 ---
 
