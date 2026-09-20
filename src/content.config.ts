@@ -57,7 +57,7 @@ const library = defineCollection({
 	}),
 });
 
-/** Plain pages such as About and FAQ. */
+/** Plain pages such as About. */
 const pages = defineCollection({
 	loader: glob({ base: './src/content/pages', pattern: '**/*.md' }),
 	schema: z.object({ title: z.string() }),

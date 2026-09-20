@@ -2,7 +2,7 @@
 """Turn the WordPress export (public REST API JSON) into the new site's content files.
 
 Inputs : data/raw/posts_all.json, pages.json, cats.json, media-refs.json, media-plan.json
-Outputs: src/content/messages/*.md, src/content/library/*.md, src/content/pages/faq.md,
+Outputs: src/content/messages/*.md, src/content/library/*.md,
          data/raw/tracks-needed.json (theme audio), data/export-report.md
 
 Rules (Epic 5 of .plan/rebuild.md):
@@ -33,7 +33,8 @@ LANG_BY_CAT = {"Malayalam": "ml", "English": "en", "Hindi": "hi", "Swahili": "sw
 LIBRARY_CATS = {5, 6, 10, 14, 17, 21, 22, 25, 27}
 TRACT_CATS = {6, 10, 14, 17, 21, 22, 25, 27}
 SKIP_PAGE_IDS = {1907: "homepage", 2: "sample page", 1332: "maintenance", 60: "gallery", 1153: "generated list of messages",
-                 46: "contact (written by hand)", 38: "about (written by hand)"}
+                 46: "contact (written by hand)", 38: "about (written by hand)",
+                 48: "FAQ (dropped: legacy from the old site)"}
 BOILERPLATE = re.compile(r"^(you can use this page to access|these works are copyrighted|if you wish to|click here|download|note:|if you face any difficulty|you can also download)", re.I)
 MEDIA_EXT = ("mp3", "zip", "avi", "mp4", "flv", "pdf", "rar", "doc", "docx", "m4a", "wav")
 
@@ -346,7 +347,6 @@ def rewrite_internal_links(report):
             m = re.search(r'"wpSlug": "([^"]+)"', text)
             if m:
                 where[urllib.parse.unquote(m.group(1)).lower()] = "/%s/%s/" % (coll, f[:-3])
-    where["faq"] = "/faq/"
     where["about"] = "/about/"
     where["contact"] = "/contact/"
     pat = re.compile(r"\[([^\]]*)\]\(https?://(?:www\.)?sjmathew\.com/?([^)\s]*)\)")
@@ -401,10 +401,6 @@ def main():
                 continue
             c = convert(item, src, media, cats, report)
             source = {"wpId": wp_id, "wpSlug": item["slug"], "wpType": src}
-            if src == "page" and wp_id == 48:  # FAQ
-                write_md(os.path.join(OUT, "pages", "faq.md"), {"title": q(c["title"])}, c["body"])
-                counts["page:faq"] += 1
-                continue
             if src == "post" and set(c["cats"]) & LIBRARY_CATS:
                 files = [d for d in c["downloads"] if d["href"].startswith(("library/", "downloads/"))]
                 files.sort(key=lambda d: (not d["href"].endswith(".pdf"),))
