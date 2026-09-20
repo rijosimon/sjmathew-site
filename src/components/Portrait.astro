@@ -24,7 +24,7 @@ const { loading = 'eager' } = Astro.props;
 
 <style>
 	.portrait {
-		margin: 0;
+		margin: 0 auto; /* centred while it is small; on wide screens it fills its column */
 		/* Small on phones and tablets so it takes little room; larger beside the text on wide screens. */
 		width: min(100%, 7.5rem);
 		border-radius: var(--radius);
