@@ -11,8 +11,7 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check",
-    "cms": "decap-server"
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
@@ -22,7 +21,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "decap-server": "^3.11.2",
     "pagefind": "^1.5.2",
     "sirv": "^3.0.2",
     "typescript": "^6.0.3"
