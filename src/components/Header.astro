@@ -35,14 +35,14 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 	</div>
 </header>
 
-<!-- Plain inline script so the menu is already closed on phones before the first paint. Without JavaScript
+<!-- Plain inline script so the menu is already closed on phones and tablets before the first paint. Without JavaScript
      the menu simply stays open and the button never appears. -->
 <script is:inline>
 	(function () {
 		var header = document.querySelector('.site-header');
 		var button = header && header.querySelector('.menu-button');
 		if (!header || !button) return;
-		var small = matchMedia('(max-width: 47.99rem)');
+		var small = matchMedia('(max-width: 59.99rem)');
 		function set(open) {
 			header.dataset.menu = open ? 'open' : 'closed';
 			button.setAttribute('aria-expanded', String(open));
@@ -75,7 +75,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 		border-bottom: 1px solid var(--line);
 		background: var(--bg);
 	}
-	/* Title and switch share the first row; the menu sits below. */
+	/* Title, switch and menu button share the first row; the menu list drops below. */
 	.bar {
 		display: flex;
 		flex-wrap: wrap;
@@ -101,9 +101,9 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 		flex-basis: 100%;
 	}
 	.menu-button {
-		display: none; /* only on phones, and only once the script is running */
+		display: none; /* only below 60rem, and only once the script is running */
 	}
-	/* Wide screens: title, menu and switch on one row. */
+	/* Wide screens (60rem and up): title, menu and switch on one row. */
 	@media (min-width: 60rem) {
 		nav {
 			order: 2;
@@ -147,8 +147,8 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 		font-weight: 600;
 	}
 
-	/* ---- Phones and small tablets: the menu folds into a hamburger button ---- */
-	@media (max-width: 47.99rem) {
+	/* ---- Phones and tablets: the menu folds into a hamburger button ---- */
+	@media (max-width: 59.99rem) {
 		.bar {
 			column-gap: 0.5rem;
 		}
