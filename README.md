@@ -12,7 +12,7 @@ Status: **preview.** The real content and media are imported. The banner and `no
 |---|---|
 | Stack | Astro 7, static output, no server code |
 | Hosting | DigitalOcean App Platform (static site); media in a DigitalOcean Space |
-| Search | Pagefind, built after the site (`/search/`) |
+| Search | A search box on the Home, Messages and Books & Tracts pages. Messages also search the full text through a Pagefind index built after the site |
 | Fonts | Noto Serif and Noto Sans per script, self-hosted at build time |
 | Comments, contact form | None; the contact page is plain text |
 

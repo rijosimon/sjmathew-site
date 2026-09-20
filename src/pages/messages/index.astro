@@ -33,10 +33,15 @@ const groups = [
 		<header class="page-head">
 			<p class="eyebrow">Messages</p>
 			<h1>Listen, watch and read</h1>
-			<p class="lede muted">Choose a language or a type, or just browse from the newest.</p>
+			<p class="lede muted">Search, choose a language or a type, or just browse from the newest.</p>
 		</header>
 
-		<Filters groups={groups} target="#message-list" noun="messages" />
+		<Filters
+			groups={groups}
+			target="#message-list"
+			noun="messages"
+			search={{ label: 'Search messages and readings', placeholder: 'Search messages and readings', fullText: true }}
+		/>
 		<div class="grid" id="message-list">
 			{messages.map((message) => <MessageCard message={message} />)}
 		</div>

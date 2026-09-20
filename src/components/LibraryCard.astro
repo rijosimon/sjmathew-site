@@ -10,7 +10,7 @@ const { item } = Astro.props;
 const { data } = item;
 ---
 
-<article class="item" data-lang={data.languages.join(' ')} data-kind={data.type}>
+<article class="item" data-lang={data.languages.join(' ')} data-kind={data.type} data-search={data.title}>
 	<div class="cover" aria-hidden="true">
 		<Icon name="book" size={34} />
 		<span>{data.type === 'book' ? 'E-book' : 'Tract'}</span>

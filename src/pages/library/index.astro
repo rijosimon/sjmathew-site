@@ -35,7 +35,12 @@ const groups = [
 			<p class="lede muted">Free to download, read and share.</p>
 		</header>
 
-		<Filters groups={groups} target="#library-list" noun="items" />
+		<Filters
+			groups={groups}
+			target="#library-list"
+			noun="items"
+			search={{ label: 'Search books and tracts', placeholder: 'Search books and tracts' }}
+		/>
 		<div class="grid wide" id="library-list">
 			{items.map((item) => <LibraryCard item={item} />)}
 		</div>

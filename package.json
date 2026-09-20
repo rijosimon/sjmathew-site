@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && pagefind --site dist && rm -f dist/pagefind/pagefind-ui.* dist/pagefind/pagefind-modular-ui.* dist/pagefind/pagefind-highlight.js dist/pagefind/pagefind-component-ui.*",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check"

@@ -13,7 +13,7 @@ const isReading = data.kind === 'article';
 const excerpt = isReading ? makeExcerpt(message.body ?? '') : '';
 ---
 
-<article class="card" data-lang={data.languages.join(' ')} data-kind={data.kind}>
+<article class="card" data-lang={data.languages.join(' ')} data-kind={data.kind} data-search={[data.title, data.series].filter(Boolean).join(' ')}>
 	<a class="card-link" href={`/messages/${message.id}/`}>
 		{
 			!isReading && (

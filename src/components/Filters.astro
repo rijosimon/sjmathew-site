@@ -1,20 +1,51 @@
 ---
+import Icon from './Icon.astro';
+
 interface Group {
 	/** Matches a `data-<name>` attribute on each item, e.g. "lang" or "kind". */
 	name: string;
 	label: string;
 	options: { value: string; label: string; lang?: string }[];
 }
+interface Search {
+	label: string;
+	placeholder: string;
+	/** Also match words inside the pages' text, using the search index built with the site. */
+	fullText?: boolean;
+}
 interface Props {
 	groups: Group[];
 	/** CSS selector of the list whose direct children are filtered. */
 	target: string;
 	noun?: string;
+	search?: Search;
 }
-const { groups, target, noun = 'items' } = Astro.props;
+const { groups, target, noun = 'items', search } = Astro.props;
 ---
 
-<search-filters class="filters" data-target={target} data-noun={noun}>
+<search-filters class="filters" data-target={target} data-noun={noun} data-fulltext={search?.fullText ? 'true' : undefined}>
+	{
+		search && (
+			<form class="search" role="search" data-search-form>
+				<label class="sr-only" for="list-search">
+					{search.label}
+				</label>
+				<span class="search-icon">
+					<Icon name="search" size={18} />
+				</span>
+				<input
+					id="list-search"
+					type="search"
+					name="q"
+					placeholder={search.placeholder}
+					autocomplete="off"
+					enterkeyhint="search"
+					spellcheck="false"
+					data-search-input
+				/>
+			</form>
+		)
+	}
 	{
 		groups.map((group) => (
 			<div class="group" role="group" aria-label={group.label}>
@@ -41,60 +72,131 @@ const { groups, target, noun = 'items' } = Astro.props;
 	}
 	<p class="count" role="status" data-count></p>
 </search-filters>
-<p class="empty" data-empty hidden>Nothing matches those filters yet. Try choosing “All”.</p>
+<p class="empty" data-empty hidden>Nothing matches that yet. Try other words, or choose “All”.</p>
 
-<script>
+<!-- Plain JavaScript on purpose (is:inline): the page loads the search index with import(), and the bundler
+     would otherwise rewrite that import into something that fails. -->
+<script is:inline>
 	class SearchFilters extends HTMLElement {
 		connectedCallback() {
-			const list = document.querySelector<HTMLElement>(this.dataset.target ?? '');
+			const list = document.querySelector(this.dataset.target ?? '');
 			if (!list) return;
 			const noun = this.dataset.noun ?? 'items';
-			const items = Array.from(list.children) as HTMLElement[];
-			const count = this.querySelector<HTMLElement>('[data-count]');
-			const empty = document.querySelector<HTMLElement>('[data-empty]');
-			const buttons = Array.from(this.querySelectorAll<HTMLButtonElement>('.chip'));
+			const fullText = this.dataset.fulltext === 'true';
+			const items = Array.from(list.children);
+			const count = this.querySelector('[data-count]');
+			const empty = document.querySelector('[data-empty]');
+			const buttons = Array.from(this.querySelectorAll('.chip'));
 			const groups = [...new Set(buttons.map((b) => b.dataset.group ?? ''))];
+			const input = this.querySelector('[data-search-input]');
+			this.querySelector('[data-search-form]')?.addEventListener('submit', (event) => event.preventDefault());
 
-			const state: Record<string, string> = {};
+			const state = {};
 			const params = new URLSearchParams(location.search);
 			for (const g of groups) {
 				const wanted = params.get(g) ?? '';
 				const known = buttons.some((b) => b.dataset.group === g && b.dataset.value === wanted);
 				state[g] = known ? wanted : '';
 			}
+			let query = (params.get('q') ?? '').trim();
+			if (input) input.value = query;
 
-			const apply = () => {
+			// --- matching -----------------------------------------------------------------
+			const normalise = (text) => text.normalize('NFKC').toLowerCase();
+			const terms = () => normalise(query).split(/\s+/).filter(Boolean);
+			/** Every word typed must appear in the item's title (and series). */
+			const titleMatches = (item) => {
+				const haystack = normalise(item.dataset.search ?? '');
+				return terms().every((term) => haystack.includes(term));
+			};
+			const pathOf = (item) => {
+				const link = item.querySelector('a');
+				return link ? new URL(link.href, location.href).pathname : '';
+			};
+
+			// Pages whose text matches, found through the search index (messages only).
+			let textHits = null;
+			let ticket = 0;
+			let pagefind = null;
+			let pagefindFailed = false;
+
+			async function loadPagefind() {
+				if (pagefind || pagefindFailed) return pagefind;
+				try {
+					pagefind = await import('/pagefind/pagefind.js');
+				} catch {
+					pagefindFailed = true; // no index (for example in development): titles still work
+				}
+				return pagefind;
+			}
+
+			async function searchText(text) {
+				const mine = ++ticket;
+				if (!fullText || text.length < 2) {
+					textHits = null;
+					apply();
+					return;
+				}
+				const engine = await loadPagefind();
+				if (!engine) return;
+				const found = await engine.search(text);
+				const pages = await Promise.all(found.results.slice(0, 250).map((result) => result.data()));
+				if (mine !== ticket) return; // a newer search has started
+				// The index also returns near-miss spellings with no match inside the page; keep real matches only.
+				const real = pages.filter((page) => (page.locations?.length ?? 0) > 0 || (page.weighted_locations?.length ?? 0) > 0);
+				textHits = new Set(real.map((page) => new URL(page.url, location.href).pathname));
+				apply();
+			}
+
+			// --- showing the result ----------------------------------------------------------
+			function apply() {
 				let shown = 0;
 				for (const item of items) {
-					const match = groups.every((g) => {
+					const groupsMatch = groups.every((g) => {
 						const value = state[g];
-						if (!value) return true;
-						return (item.dataset[g] ?? '').split(' ').includes(value);
+						return !value || (item.dataset[g] ?? '').split(' ').includes(value);
 					});
+					const queryMatches = !query || titleMatches(item) || (textHits?.has(pathOf(item)) ?? false);
+					const match = groupsMatch && queryMatches;
 					item.hidden = !match;
 					if (match) shown++;
 				}
 				for (const b of buttons) {
 					b.setAttribute('aria-pressed', String(state[b.dataset.group ?? ''] === (b.dataset.value ?? '')));
 				}
-				if (count) count.textContent = `Showing ${shown} of ${items.length} ${noun}`;
+				if (count) count.textContent = `Showing ${shown} of ${items.length} ${noun}${query ? ` matching “${query}”` : ''}`;
 				if (empty) empty.hidden = shown !== 0;
 				const next = new URLSearchParams();
 				for (const g of groups) if (state[g]) next.set(g, state[g]);
-				const query = next.toString();
-				history.replaceState(null, '', query ? `?${query}` : location.pathname);
-			};
+				if (query) next.set('q', query);
+				const text = next.toString();
+				history.replaceState(null, '', text ? `?${text}` : location.pathname);
+			}
+
+			let timer;
+			input?.addEventListener('input', () => {
+				query = input.value.trim();
+				textHits = null;
+				apply();
+				clearTimeout(timer);
+				timer = window.setTimeout(() => void searchText(query), 200);
+			});
 
 			this.addEventListener('click', (event) => {
-				const button = (event.target as HTMLElement).closest<HTMLButtonElement>('.chip');
+				const button = event.target.closest('.chip');
 				if (!button) return;
 				state[button.dataset.group ?? ''] = button.dataset.value ?? '';
 				apply();
 			});
+
 			apply();
+			if (query) void searchText(query);
 		}
 	}
-	customElements.define('search-filters', SearchFilters);
+	// An inline script runs while the page is still being read, before the list it filters exists.
+	const define = () => customElements.define('search-filters', SearchFilters);
+	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', define);
+	else define();
 </script>
 
 <style>
@@ -103,6 +205,37 @@ const { groups, target, noun = 'items' } = Astro.props;
 		flex-direction: column;
 		gap: 0.75rem;
 		margin-bottom: 1.25rem;
+	}
+	.search {
+		position: relative;
+		max-width: 30rem;
+	}
+	.search-icon {
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 1rem;
+		display: grid;
+		place-items: center;
+		color: var(--ink-2);
+		pointer-events: none;
+	}
+	.search input {
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0.5rem 1rem 0.5rem 2.75rem;
+		font: inherit;
+		color: var(--ink);
+		background: var(--surface);
+		border: 1px solid var(--line);
+		border-radius: 999px;
+	}
+	.search input::placeholder {
+		color: var(--ink-2);
+	}
+	.search input:focus-visible {
+		outline: 3px solid var(--accent);
+		outline-offset: 2px;
+		border-color: var(--accent);
 	}
 	.group {
 		display: flex;
