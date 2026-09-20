@@ -10,7 +10,7 @@ export const SITE = {
 	/** The home page headline. */
 	tagline: 'Biblical Messages to listen to, watch and read.',
 	/** The line under the headline. */
-	intro: `From the ministry of ${NAME}, in Malayalam, English, Hindi, Kiswahili and more, plus e-books and tracts to download. Everything is free.`,
+	intro: `From the ministry of ${NAME}, in Malayalam, English, Hindi, Kiswahili and more. Everything is free.`,
 	/** For search results and link previews. */
 	description: `Biblical messages from the ministry of ${NAME}, in Malayalam, English, Hindi and more. E-books and tracts too. Everything is free.`,
 	url: 'https://www.sjmathew.com',
