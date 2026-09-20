@@ -1,5 +1,12 @@
 name: sjmathew-site
 region: sgp
+domains:
+  - domain: www.sjmathew.com
+    type: PRIMARY
+    zone: sjmathew.com
+  - domain: sjmathew.com
+    type: ALIAS
+    zone: sjmathew.com
 static_sites:
   - name: web
     github:

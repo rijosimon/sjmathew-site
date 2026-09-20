@@ -13,6 +13,8 @@ interface Props {
 }
 const { title, description = SITE.description, lang = 'en' } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
+/** One address per page, so search engines do not split it across www, the bare name and the app address. */
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
 ---
 
 <!doctype html>
@@ -40,6 +42,8 @@ const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
 		<meta property="og:title" content={fullTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:url" content={canonical} />
 		{PREVIEW && <meta name="robots" content="noindex, nofollow" />}
 		<link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
 		<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />

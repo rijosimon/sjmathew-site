@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
-/** Shown as a banner and used to add noindex while this is only a design preview. */
-export const PREVIEW = true;
+/** When true, a banner is shown and search engines are told not to list the site. Off now that the site is live. */
+export const PREVIEW = false;
 
 const NAME = 'Saju John Mathew';
 
