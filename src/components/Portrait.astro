@@ -15,7 +15,7 @@ const { loading = 'eager' } = Astro.props;
 		src={portrait}
 		alt={SITE.name}
 		widths={[320, 480, 640]}
-		sizes="(min-width: 52rem) 20rem, min(70vw, 18rem)"
+		sizes="(min-width: 52rem) 20rem, 9rem"
 		loading={loading}
 		fetchpriority={loading === 'eager' ? 'high' : undefined}
 		decoding="async"
@@ -25,13 +25,24 @@ const { loading = 'eager' } = Astro.props;
 <style>
 	.portrait {
 		margin: 0;
-		width: min(100%, 18rem);
+		/* Small on phones and tablets so it takes little room; larger beside the text on wide screens. */
+		width: min(100%, 7.5rem);
 		border-radius: var(--radius);
 		overflow: hidden;
 		background: var(--accent-soft);
 		box-shadow: var(--shadow);
 		outline: 1px solid var(--line);
 		outline-offset: -1px;
+	}
+	@media (min-width: 40rem) {
+		.portrait {
+			width: min(100%, 9rem);
+		}
+	}
+	@media (min-width: 52rem) {
+		.portrait {
+			width: min(100%, 18rem);
+		}
 	}
 	.portrait :global(img) {
 		display: block;

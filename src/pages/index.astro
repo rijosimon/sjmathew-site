@@ -94,9 +94,25 @@ const tiles = LANGUAGE_ORDER.map((code) => ({
 <style>
 	.hero {
 		display: grid;
-		gap: 2rem;
 		align-items: center;
 		padding-block: clamp(2.5rem, 1.5rem + 5vw, 5rem) clamp(1rem, 0.5rem + 2vw, 2rem);
+	}
+	/* Phones and tablets: the small portrait sits between the "Bible teacher" line and the heading.
+	   The text block dissolves into the grid so its parts can be ordered around the portrait. */
+	@media (max-width: 51.99rem) {
+		.hero-text {
+			display: contents;
+		}
+		.hero-text > * {
+			order: 3;
+		}
+		.hero-text > .eyebrow {
+			order: 1;
+		}
+		.hero :global(.portrait) {
+			order: 2;
+			margin-block: 0.25rem 1.25rem;
+		}
 	}
 	@media (min-width: 52rem) {
 		.hero {
