@@ -1,0 +1,135 @@
+---
+import Icon from './Icon.astro';
+---
+
+<button type="button" class="theme-toggle" role="switch" aria-checked="false" aria-label="Dark theme" data-theme-toggle>
+	<span class="track" aria-hidden="true">
+		<span class="mark mark-sun"><Icon name="sun" size={14} /></span>
+		<span class="mark mark-moon"><Icon name="moon" size={14} /></span>
+		<span class="knob">
+			<span class="face face-sun"><Icon name="sun" size={14} /></span>
+			<span class="face face-moon"><Icon name="moon" size={14} /></span>
+		</span>
+	</span>
+</button>
+
+<script>
+	const KEY = 'sjm-theme';
+	const COLORS = { light: '#fbf8f3', dark: '#14120f' } as const;
+	type Theme = keyof typeof COLORS;
+
+	const button = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+	const root = document.documentElement;
+	const systemDark = matchMedia('(prefers-color-scheme: dark)');
+
+	function saved(): Theme | null {
+		try {
+			const value = localStorage.getItem(KEY);
+			return value === 'light' || value === 'dark' ? value : null;
+		} catch {
+			return null;
+		}
+	}
+
+	/** Show a theme. `remember` is true only when the visitor chose it themselves. */
+	function apply(theme: Theme, remember: boolean) {
+		root.dataset.theme = theme;
+		button?.setAttribute('aria-checked', String(theme === 'dark'));
+		button?.setAttribute('title', theme === 'dark' ? 'Switch to the light theme' : 'Switch to the dark theme');
+		const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+		if (meta) meta.content = COLORS[theme];
+		if (remember) {
+			try {
+				localStorage.setItem(KEY, theme);
+			} catch {
+				/* storage unavailable: the choice lasts for this page view only */
+			}
+		}
+	}
+
+	apply(root.dataset.theme === 'dark' ? 'dark' : 'light', false);
+	button?.addEventListener('click', () => apply(root.dataset.theme === 'dark' ? 'light' : 'dark', true));
+	// Until the visitor picks a theme, follow the device when it changes (for example at sunset).
+	systemDark.addEventListener('change', (event) => {
+		if (!saved()) apply(event.matches ? 'dark' : 'light', false);
+	});
+</script>
+
+<style>
+	.theme-toggle {
+		display: inline-grid;
+		place-items: center;
+		min-width: 3.5rem;
+		min-height: 2.75rem; /* a comfortable touch target around the small switch */
+		padding: 0;
+		background: none;
+		border: 0;
+		cursor: pointer;
+		color: var(--ink-2);
+		border-radius: 999px;
+	}
+	.track {
+		position: relative;
+		display: block;
+		width: 3.5rem;
+		height: 2rem;
+		border-radius: 999px;
+		background: var(--surface-2);
+		border: 1px solid var(--line);
+		transition: border-color 0.2s, background-color 0.2s;
+	}
+	.theme-toggle:hover .track {
+		border-color: var(--accent);
+	}
+	/* The two symbols resting in the track, one at each end. */
+	.mark {
+		position: absolute;
+		top: 50%;
+		display: grid;
+		place-items: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		transform: translateY(-50%);
+	}
+	.mark-sun {
+		left: 0.2rem;
+	}
+	.mark-moon {
+		right: 0.2rem;
+	}
+	/* The knob covers the symbol of the theme in use and slides to the other end when switched. */
+	.knob {
+		position: absolute;
+		top: 0.2rem;
+		left: 0.2rem;
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 50%;
+		background: var(--accent);
+		color: var(--accent-ink);
+		box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+		transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+	.face {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		transition: opacity 0.2s, transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+	.face-moon {
+		opacity: 0;
+		transform: rotate(-60deg) scale(0.6);
+	}
+	:global(html[data-theme='dark']) .knob {
+		transform: translateX(1.5rem);
+	}
+	:global(html[data-theme='dark']) .face-sun {
+		opacity: 0;
+		transform: rotate(60deg) scale(0.6);
+	}
+	:global(html[data-theme='dark']) .face-moon {
+		opacity: 1;
+		transform: none;
+	}
+</style>

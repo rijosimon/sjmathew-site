@@ -20,6 +20,21 @@ const fullTitle = title ? `${title} · ${SITE.name}` : SITE.name;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="theme-color" content="#fbf8f3" />
+		<script is:inline>
+			// Runs before the page paints, so there is no flash of the wrong theme.
+			(function () {
+				var saved = null;
+				try {
+					saved = localStorage.getItem('sjm-theme');
+				} catch (e) {}
+				var theme = saved === 'light' || saved === 'dark' ? saved : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+				document.documentElement.dataset.theme = theme;
+				var meta = document.querySelector('meta[name="theme-color"]');
+				if (meta) meta.content = theme === 'dark' ? '#14120f' : '#fbf8f3';
+			})();
+		</script>
 		<title>{fullTitle}</title>
 		<meta name="description" content={description} />
 		<meta property="og:title" content={fullTitle} />

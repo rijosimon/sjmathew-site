@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../lib/site';
+import ThemeToggle from './ThemeToggle.astro';
 
 const nav = [
 	{ href: '/messages/', label: 'Messages' },
@@ -15,6 +16,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 <header class="site-header">
 	<div class="wrap bar">
 		<a class="brand" href="/">{SITE.name}</a>
+		<div class="theme"><ThemeToggle /></div>
 		<nav aria-label="Main">
 			<ul>
 				{
@@ -36,21 +38,40 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 		border-bottom: 1px solid var(--line);
 		background: var(--bg);
 	}
+	/* Phones and tablets: title and switch share the first row, the menu sits below. */
 	.bar {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		justify-content: space-between;
 		gap: 0.25rem 1.5rem;
 		padding-block: 0.6rem;
 	}
 	.brand {
+		order: 1;
+		margin-inline-end: auto;
 		font-family: var(--serif);
 		font-weight: 700;
 		font-size: clamp(1.4rem, 1.25rem + 0.6vw, 1.65rem);
 		color: var(--ink);
 		text-decoration: none;
 		padding-block: 0.4rem;
+	}
+	.theme {
+		order: 2;
+	}
+	nav {
+		order: 3;
+		flex-basis: 100%;
+	}
+	/* Wide screens: title, menu and switch on one row. */
+	@media (min-width: 60rem) {
+		nav {
+			order: 2;
+			flex-basis: auto;
+		}
+		.theme {
+			order: 3;
+		}
 	}
 	ul {
 		list-style: none;

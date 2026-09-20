@@ -39,8 +39,36 @@
 	}
 }
 
+/* Themes. A saved choice sets data-theme on <html> (see the script in the page head); with no
+   script the device setting decides. Each theme repeats its colours so either path works. */
+:root[data-theme='light'] {
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--bg: #14120f;
+	--surface: #1c1915;
+	--surface-2: #25211b;
+	--ink: #efe9de;
+	--ink-2: #b9b1a3;
+	--line: #332e26;
+	--accent: #6fc7c9;
+	--accent-ink: #0b2426;
+	--accent-soft: #1f3a3c;
+	--shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 20px rgb(0 0 0 / 0.3);
+	--lang-ml: #e39a72;
+	--lang-en: #6fc7c9;
+	--lang-hi: #c7a0e2;
+	--lang-sw: #8ccb88;
+	--lang-pt: #e0b45c;
+	--lang-ta: #ee92b5;
+	--lang-si: #97a7e8;
+}
+
 @media (prefers-color-scheme: dark) {
-	:root {
+	:root:not([data-theme]) {
+		color-scheme: dark;
 		--bg: #14120f;
 		--surface: #1c1915;
 		--surface-2: #25211b;
