@@ -3,7 +3,7 @@ import { SITE } from '../lib/site';
 
 const nav = [
 	{ href: '/messages/', label: 'Messages' },
-	{ href: '/library/', label: 'Books & tracts' },
+	{ href: '/library/', label: 'Books & Tracts' },
 	{ href: '/about/', label: 'About' },
 	{ href: '/search/', label: 'Search' },
 	{ href: '/contact/', label: 'Contact' },
@@ -47,7 +47,7 @@ const isCurrent = (href: string) => path === href || path.startsWith(href);
 	.brand {
 		font-family: var(--serif);
 		font-weight: 700;
-		font-size: 1.25rem;
+		font-size: clamp(1.4rem, 1.25rem + 0.6vw, 1.65rem);
 		color: var(--ink);
 		text-decoration: none;
 		padding-block: 0.4rem;
